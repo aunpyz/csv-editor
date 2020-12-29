@@ -30,9 +30,9 @@
                         foreach ($data as $key => $value) {
                             echo "<section>";
                             echo "<label>Key: </label>";
-                            echo "<span data-key='key' role='textbox' contenteditable>{$key}</span>";
+                            echo "<input data-key='key' onkeyup='validateUnserializedFields(event)' value='{$key}'>";
                             echo "<label>Value: </label>";
-                            echo "<span data-key='value' role='textbox' contenteditable>{$value}</span>";
+                            echo "<input data-key='value' onkeyup='validateUnserializedFields(event)' value='{$value}'>";
                             echo "<button onclick='removeItem(event)'>Remove</button>";
                             echo "</section>";
                         }
@@ -43,7 +43,7 @@
                             <button onclick='addItemField(event)'>Add new</button>
                         </div>";
                     } else {
-                        echo "<span role='textbox' contenteditable>{$current}</span>";
+                        echo "<input value='{$current}'>";
                         echo "<br/>";
                     }
                 }
@@ -58,27 +58,35 @@
 
 <script>
     const resetLoadFileButton = () => loadFileButton.disabled = !file.value;
+    const validateUnserializedFields = ({target}) => {
+        const button = target.parentNode.parentNode.nextSibling.querySelector('button');
+        const fields = [...target.parentNode.parentNode.getElementsByTagName('input')].filter(el => !el.value);
+        if (fields.length) {
+            button.disabled = true;
+        } else {
+            button.disabled = false;
+        }
+    }
     const removeItem = ({target}) => target.parentNode.remove();
     const addItemField = ({target}) => {
         const sibling = target.parentNode.previousSibling;
         const section = document.createElement("section");
         section.appendChild(newElement("label", "Key: "));
-        section.appendChild(newElement("span", undefined, [
+        section.appendChild(newElement("input", undefined, [
             {key: 'data-key', value: 'key'},
-            {key: 'role', value: 'textbox'},
-            {key: 'contenteditable', value: 'true'}
+            {key: 'onkeyup', value: 'validateUnserializedFields(event)'}
         ]));
         section.appendChild(newElement("label", "Value: "));
-        section.appendChild(newElement("span", undefined, [
+        section.appendChild(newElement("input", undefined, [
             {key: 'data-key', value: 'value'},
-            {key: 'role', value: 'textbox'},
-            {key: 'contenteditable', value: 'true'}
+            {key: 'onkeyup', value: 'validateUnserializedFields(event)'}
         ]));
         section.appendChild(newElement("button", "Remove", [
             {key: "onclick", value: "removeItem(event)"}
         ]));
 
         sibling.appendChild(section);
+        target.disabled = true;
     };
     const newElement = (type, text, attributes) => {
         elm = document.createElement(type);
