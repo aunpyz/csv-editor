@@ -36,11 +36,11 @@
                             echo "<div class='unserialized' data-serialize='$fields[$i]'>";
                             $j = 0;
                             foreach ($data as $key => $value) {
-                                echo "<section>";
+                                echo "<section data-name='{$recordName}' data-item='{$j}'>";
                                 echo "<label>Key: </label>";
-                                echo "<input name='{$recordName}[{$j}][key]' data-key='key' onkeyup='validateUnserializedFields(event)' value='{$key}'>";
+                                echo "<input name='{$recordName}[{$j}][key]' onkeyup='validateUnserializedFields(event)' value='{$key}'>";
                                 echo "<label>Value: </label>";
-                                echo "<input name='{$recordName}[{$j}][value]' data-key='value' onkeyup='validateUnserializedFields(event)' value='{$value}'>";
+                                echo "<input name='{$recordName}[{$j}][value]' onkeyup='validateUnserializedFields(event)' value='{$value}'>";
                                 echo "<button onclick='removeItem(event)'>Remove</button>";
                                 echo "</section>";
                                 ++$j;
@@ -78,17 +78,23 @@
         }
     }
     const removeItem = ({target}) => target.parentNode.remove();
-    const addItemField = ({target}) => {
+    const addItemField = ({ target }) => {
         const sibling = target.parentNode.previousSibling;
-        const section = document.createElement("section");
+        const currentLastChild = sibling.lastChild;
+        const [name, item] = [currentLastChild.dataset.name, parseInt(currentLastChild.dataset.item) + 1];
+        const newName = `${name}[${item}]`;
+        const section = newElement("section", null, [
+            {key: 'data-name', value: name},
+            {key: 'data-item', value: item}
+        ]);
         section.appendChild(newElement("label", "Key: "));
-        section.appendChild(newElement("input", undefined, [
-            {key: 'data-key', value: 'key'},
+        section.appendChild(newElement("input", null, [
+            {key: 'name', value: `${newName}[key]`},
             {key: 'onkeyup', value: 'validateUnserializedFields(event)'}
         ]));
         section.appendChild(newElement("label", "Value: "));
-        section.appendChild(newElement("input", undefined, [
-            {key: 'data-key', value: 'value'},
+        section.appendChild(newElement("input", null, [
+            {key: 'name', value: `${newName}[value]`},
             {key: 'onkeyup', value: 'validateUnserializedFields(event)'}
         ]));
         section.appendChild(newElement("button", "Remove", [
@@ -101,7 +107,7 @@
     const newElement = (type, text, attributes) => {
         elm = document.createElement(type);
         if (text) {
-            elm.innerHTML = text;
+            elm.textContent = text;
         }
         if (attributes) {
             attributes.forEach(({key, value}) => {
