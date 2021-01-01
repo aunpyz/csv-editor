@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="./color.css">
+
 <form action="index.php" method="POST" enctype="multipart/form-data">
     <input id="file" name="file" type="file" accept=".csv" onchange="resetLoadFileButton()">
     <button id="file-open" type="submit" value="open">Open file</button>
@@ -5,7 +7,7 @@
 
 <form action="savefile.php" method="POST" enctype="multipart/form-data">
     <?php
-        if (isset($_FILES['file'])) {
+        if (isset($_FILES["file"])) {
             $serialized_pattern = "/^a:\d+:{/";
             $file_path = $_FILES['file']['tmp_name'];
             try {
@@ -17,6 +19,11 @@
                 echo "<input name='filename' value='{$_FILES['file']['name']}'>";
                 echo "<button type='submit' value='save'>Save file</button>";
 
+                echo "<div style='display: none;'>";
+                foreach ($fields as $key => $keyName) {
+                    echo "<input name='keys[{$key}]' value='{$keyName}'>";
+                }
+                echo "</div>";
 
                 for ($iter = 0; !feof($file); ++$iter) {
                     // input name will be record[iterator][keyname]
@@ -143,8 +150,5 @@
     }
     .csv-data > .unserialized {
         margin-left: 8px;
-    }
-    .error {
-        color: red;
     }
 </style>
