@@ -16,12 +16,12 @@
                 $id_idx = array_search("id", $fields, true);
 
                 echo "<label for='filename'>File name</label>";
-                echo "<input name='filename' value='{$_FILES['file']['name']}'>";
+                echo "<input name='filename' value='" . htmlentities($_FILES['file']['name'], ENT_QUOTES) ."'>";
                 echo "<button type='submit' value='save'>Save file</button>";
 
                 echo "<div style='display: none;'>";
                 foreach ($fields as $key => $keyName) {
-                    echo "<input name='keys[{$key}]' value='{$keyName}'>";
+                    echo "<input name='keys[{$key}]' value='" .htmlentities($keyName, ENT_QUOTES). "'>";
                 }
                 echo "</div>";
 
@@ -45,9 +45,9 @@
                             foreach ($data as $key => $value) {
                                 echo "<section data-name='{$recordName}' data-item='{$j}'>";
                                 echo "<label>Key: </label>";
-                                echo "<input name='{$recordName}[{$j}][key]' onkeyup='validateUnserializedFields(event)' value='{$key}'>";
+                                echo "<input name='{$recordName}[{$j}][key]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($key, ENT_QUOTES) . "'>";
                                 echo "<label>Value: </label>";
-                                echo "<input name='{$recordName}[{$j}][value]' onkeyup='validateUnserializedFields(event)' value='{$value}'>";
+                                echo "<input name='{$recordName}[{$j}][value]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($value, ENT_QUOTES) . "'>";
                                 echo "<button onclick='removeItem(event)'>Remove</button>";
                                 echo "</section>";
                                 ++$j;
@@ -59,7 +59,7 @@
                                 <button onclick='addItemField(event)'>Add new</button>
                             </div>";
                         } else {
-                            echo "<input name='{$recordName}' value='{$current}'>";
+                            echo "<input name='{$recordName}' value='" . htmlentities($current, ENT_QUOTES) . "'>";
                             echo "<br/>";
                         }
                     }
