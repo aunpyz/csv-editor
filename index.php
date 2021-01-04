@@ -19,13 +19,17 @@
                 echo "<input name='filename' value='" . htmlentities($_FILES['file']['name'], ENT_QUOTES) ."' required>";
                 echo "<button type='submit' value='save'>Save file</button>";
 
-                echo "<div style='display: none;'>";
+                echo "<div id='fields' style='display: none;'>";
                 foreach ($fields as $key => $keyName) {
                     echo "<input name='keys[{$key}]' value='" .htmlentities($keyName, ENT_QUOTES). "' required>";
                 }
                 echo "</div>";
 
-                for ($iter = 0; !feof($file); ++$iter) {
+                echo "<div><button type='button' onclick='createRecord()'>Add new record</div>";
+
+                echo "<div id='records'>";
+                $iter = 0;
+                for ($iter; !feof($file); ++$iter) {
                     // input name will be record[iterator][keyname]
                     $name = "record[{$iter}]";
                     $record = fgetcsv($file);
@@ -33,7 +37,7 @@
                     if (empty($record)) {
                         break;
                     }
-                    echo "<div class='csv-data' data-id='{$record[$id_idx]}'>";
+                    echo "<div class='csv-data' data-id='{$iter}'>";
                     for ($i = 0; $i < count($record); ++$i) {
                         $recordName = "{$name}[{$fields[$i]}]";
                         $current = $record[$i];
@@ -43,7 +47,7 @@
                             echo "<div class='unserialized' data-serialize='$fields[$i]'>";
                             $j = 0;
                             foreach ($data as $key => $value) {
-                                echo "<section data-name='{$recordName}' data-item='{$j}'>";
+                                echo "<section>";
                                 echo "<label>Key: </label>";
                                 echo "<input name='{$recordName}[{$j}][key]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($key, ENT_QUOTES) . "' required>";
                                 echo "<label>Value: </label>";
@@ -56,7 +60,7 @@
                             // add new button
                             echo
                             "<div>
-                                <button type='button' onclick='addItemField(event)'>Add new</button>
+                                <button id='newArrField' type='button' onclick='addItemField(event)'>Add new</button>
                             </div>";
                         } else {
                             echo "<input name='{$recordName}' value='" . htmlentities($current, ENT_QUOTES) . "' required>";
@@ -65,7 +69,12 @@
                     }
                     echo "</div>";
                 }
+                echo "</div>";
                 fclose($file);
+
+                if ($iter) {
+                    echo "<div><button type='button' onclick='createRecord()'>Add new record</div>";
+                }
             } catch (Exception $e) {
                 echo "<div class='error'>{$e->getMessage()}</div>";
             }
@@ -90,10 +99,7 @@
         const currentLastChild = sibling.lastChild;
         const [name, item] = [currentLastChild.dataset.name, parseInt(currentLastChild.dataset.item) + 1];
         const newName = `${name}[${item}]`;
-        const section = newElement("section", null, [
-            {key: 'data-name', value: name},
-            {key: 'data-item', value: item}
-        ]);
+        const section = newElement("section");
         section.appendChild(newElement("label", "Key: "));
         section.appendChild(newElement("input", null, [
             {key: 'name', value: `${newName}[key]`},
@@ -124,6 +130,47 @@
         }
 
         return elm;
+    }
+    const createRecord = () => {
+        if (document.querySelector("#records .csv-data")) {
+            const lastRecord = document.querySelector("#records").lastChild;
+            const newRecordId = parseInt(lastRecord.dataset.id) + 1;
+            let newRecord = lastRecord.cloneNode(true);
+            newRecord.querySelector("#newArrField").disabled = true;
+            newRecord.dataset.id = newRecordId;
+            newRecord.querySelectorAll("input").forEach(input => {
+                input.removeAttribute("value");
+                input.name = input.name.replace(/record\[\d+\]/, `record[${newRecordId}]`);
+            });
+            document.getElementById("records").appendChild(newRecord);
+            newRecord.querySelector("input").focus();
+        } else {
+            const fieldsContainer = document.querySelector("#fields");
+            const record = newElement("div", null, [
+                        {key: 'class', value: 'csv-data'},
+                        {key: 'data-id', value: 0}
+                    ]);
+            fieldsContainer.querySelectorAll("input")
+                .forEach(field => {
+                    const div = newElement("div");
+                    const strong = newElement("strong", `${field.value}: `)
+                    const input = newElement("input");
+                    input.required = true;
+
+                    div.appendChild(strong);
+                    div.appendChild(input);
+
+                    record.appendChild(div);
+                });
+            document.getElementById("records").appendChild(record)
+                .parentNode
+                .parentNode
+                .appendChild(newElement("button", "Add new record", [
+                        {key: 'type', value: 'button'},
+                        {key: 'onclick', value: 'createRecord()'}
+                    ]));
+            record.querySelector("input").focus();
+        }
     }
 
     const loadFileButton = document.getElementById("file-open");
