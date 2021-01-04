@@ -154,7 +154,9 @@
                 .forEach(field => {
                     const div = newElement("div");
                     const strong = newElement("strong", `${field.value}: `)
-                    const input = newElement("input");
+                    const input = newElement("input", null, [
+                        {key: 'name', value: `record[0][${field.value}]`}
+                    ]);
                     input.required = true;
 
                     div.appendChild(strong);
