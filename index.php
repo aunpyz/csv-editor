@@ -16,12 +16,12 @@
                 $id_idx = array_search("id", $fields, true);
 
                 echo "<label for='filename'>File name</label>";
-                echo "<input name='filename' value='" . htmlentities($_FILES['file']['name'], ENT_QUOTES) ."'>";
+                echo "<input name='filename' value='" . htmlentities($_FILES['file']['name'], ENT_QUOTES) ."' required>";
                 echo "<button type='submit' value='save'>Save file</button>";
 
                 echo "<div style='display: none;'>";
                 foreach ($fields as $key => $keyName) {
-                    echo "<input name='keys[{$key}]' value='" .htmlentities($keyName, ENT_QUOTES). "'>";
+                    echo "<input name='keys[{$key}]' value='" .htmlentities($keyName, ENT_QUOTES). "' required>";
                 }
                 echo "</div>";
 
@@ -45,10 +45,10 @@
                             foreach ($data as $key => $value) {
                                 echo "<section data-name='{$recordName}' data-item='{$j}'>";
                                 echo "<label>Key: </label>";
-                                echo "<input name='{$recordName}[{$j}][key]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($key, ENT_QUOTES) . "'>";
+                                echo "<input name='{$recordName}[{$j}][key]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($key, ENT_QUOTES) . "' required>";
                                 echo "<label>Value: </label>";
-                                echo "<input name='{$recordName}[{$j}][value]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($value, ENT_QUOTES) . "'>";
-                                echo "<button onclick='removeItem(event)'>Remove</button>";
+                                echo "<input name='{$recordName}[{$j}][value]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($value, ENT_QUOTES) . "' required>";
+                                echo "<button type='button' onclick='removeItem(event)'>Remove</button>";
                                 echo "</section>";
                                 ++$j;
                             }
@@ -56,10 +56,10 @@
                             // add new button
                             echo
                             "<div>
-                                <button onclick='addItemField(event)'>Add new</button>
+                                <button type='button' onclick='addItemField(event)'>Add new</button>
                             </div>";
                         } else {
-                            echo "<input name='{$recordName}' value='" . htmlentities($current, ENT_QUOTES) . "'>";
+                            echo "<input name='{$recordName}' value='" . htmlentities($current, ENT_QUOTES) . "' required>";
                             echo "<br/>";
                         }
                     }
@@ -108,6 +108,7 @@
             {key: "onclick", value: "removeItem(event)"}
         ]));
 
+        section.querySelectorAll("input").forEach(input => input.required = true);
         sibling.appendChild(section);
         target.disabled = true;
     };
