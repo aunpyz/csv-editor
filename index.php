@@ -136,8 +136,14 @@
             const lastRecord = document.querySelector("#records").lastChild;
             const newRecordId = parseInt(lastRecord.dataset.id) + 1;
             let newRecord = lastRecord.cloneNode(true);
-            newRecord.querySelector("#newArrField").disabled = true;
+            let addArrFieldButton = newRecord.querySelector("#newArrField")
+            if (addArrFieldButton) {
+                // only exist on array type field
+                addArrFieldButton.disabled = true;   
+            }
             newRecord.dataset.id = newRecordId;
+            newRecord.querySelector("input[name$='[id]']").value = newRecordId + 1;
+            newRecord.querySelectorAll("input[name$='[key]'").forEach(i => i.value = i.value);
             newRecord.querySelectorAll("input").forEach(input => {
                 input.removeAttribute("value");
                 input.name = input.name.replace(/record\[\d+\]/, `record[${newRecordId}]`);
@@ -171,7 +177,9 @@
                         {key: 'type', value: 'button'},
                         {key: 'onclick', value: 'createRecord()'}
                     ]));
-            record.querySelector("input").focus();
+            const idInput = record.querySelector("input");
+            idInput.value = 1;
+            idInput.focus();
         }
     }
 
