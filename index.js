@@ -136,6 +136,10 @@ const newField = () => {
     tr.querySelectorAll("input").forEach(input => input.removeAttribute("value"));
     tbody.appendChild(tr);
 }
+const changeFieldName = ({target}) => {
+    nthOfType = parseInt(target.name.match(/\d+/)[0]) + 1;
+    document.querySelectorAll(`.csv-data strong:nth-of-type(${nthOfType})`).forEach(strong => strong.textContent = `${target.value}: `);
+}
 
 const loadFileButton = document.getElementById("file-open");
 const file = document.getElementById("file");

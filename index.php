@@ -44,7 +44,7 @@
                 echo
                     "<tr>
                         <td>
-                            <input name='keys[{$key}]' value='" . htmlentities($keyName, ENT_QUOTES) . "' required>
+                            <input name='keys[{$key}]' onkeyup='changeFieldName(event)' value='" . htmlentities($keyName, ENT_QUOTES) . "' required>
                         </td>
                         <td>
                             <input type='checkbox'>
