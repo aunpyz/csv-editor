@@ -19,152 +19,79 @@
 <form action="savefile.php" method="POST" enctype="multipart/form-data">
     <?php
     if (isset($_FILES["file"])) {
-        if (isset($_POST['force_serialize'])) {
-            $serialized_pattern = "/^a:\d+:{/";
-            $file_path = $_FILES['file']['tmp_name'];
-            try {
-                $file = fopen($file_path, "r+");
-                $fields = fgetcsv($file);
-                $id_idx = array_search("id", $fields, true);
+        $serialized_pattern = "/^a:\d+:{/";
+        $file_path = $_FILES['file']['tmp_name'];
+        try {
+            $file = fopen($file_path, "r+");
+            $fields = fgetcsv($file);
+            $id_idx = array_search("id", $fields, true);
 
-                echo "<label for='filename'>File name</label>";
-                echo "<input name='filename' value='" . htmlentities($_FILES['file']['name'], ENT_QUOTES) . "' required>";
-                echo "<button type='submit' value='save'>Save file</button>";
+            echo "<label for='filename'>File name</label>";
+            echo "<input name='filename' value='" . htmlentities($_FILES['file']['name'], ENT_QUOTES) . "' required>";
+            echo "<button type='submit' value='save'>Save file</button>";
 
-                echo "<div id='fields' style='display: none;'>";
-                foreach ($fields as $key => $keyName) {
-                    echo "<input name='keys[{$key}]' value='" . htmlentities($keyName, ENT_QUOTES) . "' required>";
-                }
-                echo "</div>";
-
-                echo "<div><button type='button' onclick='createRecord()'>Add new record</div>";
-
-                echo "<div id='records'>";
-                $iter = 0;
-                for ($iter; !feof($file); ++$iter) {
-                    // input name will be record[iterator][keyname]
-                    $name = "record[{$iter}]";
-                    $record = fgetcsv($file);
-                    // empty line
-                    if (empty($record)) {
-                        break;
-                    }
-                    echo "<div class='csv-data' data-id='{$iter}'>";
-                    for ($i = 0; $i < count($record); ++$i) {
-                        $recordName = "{$name}[{$fields[$i]}]";
-                        $current = $record[$i];
-                        if ($fields[$i] == 'name') {
-                            $serialized = serialize(['zh' => $current]);
-                            $current = $serialized;
-                        }
-                        echo "<strong>$fields[$i]: </strong>";
-                        if (preg_match($serialized_pattern, $current)) {
-                            $data = unserialize($current);
-                            echo "<div class='unserialized' data-serialize='$fields[$i]'>";
-                            $j = 0;
-                            foreach ($data as $key => $value) {
-                                echo "<section>";
-                                echo "<label>Key: </label>";
-                                echo "<input name='{$recordName}[{$j}][key]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($key, ENT_QUOTES) . "' required>";
-                                echo "<label>Value: </label>";
-                                echo "<input name='{$recordName}[{$j}][value]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($value, ENT_QUOTES) . "' required>";
-                                echo "<button type='button' onclick='removeItem(event)'>Remove</button>";
-                                echo "</section>";
-                                ++$j;
-                            }
-                            echo "</div>";
-                            // add new button
-                            echo
-                                "<div>
-                                    <button id='newArrField' type='button' onclick='addItemField(event)'>Add new</button>
-                                </div>";
-                        } else {
-                            echo "<input name='{$recordName}' value='" . htmlentities($current, ENT_QUOTES) . "' required>";
-                            echo "<br/>";
-                        }
-                    }
-                    echo "</div>";
-                }
-                echo "</div>";
-                fclose($file);
-
-                if ($iter) {
-                    echo "<div><button type='button' onclick='createRecord()'>Add new record</div>";
-                }
-            } catch (Exception $e) {
-                echo "<div class='error'>{$e->getMessage()}</div>";
+            echo "<div id='fields' style='display: none;'>";
+            foreach ($fields as $key => $keyName) {
+                echo "<input name='keys[{$key}]' value='" . htmlentities($keyName, ENT_QUOTES) . "' required>";
             }
-        } else {
-            $serialized_pattern = "/^a:\d+:{/";
-            $file_path = $_FILES['file']['tmp_name'];
-            try {
-                $file = fopen($file_path, "r+");
-                $fields = fgetcsv($file);
-                $id_idx = array_search("id", $fields, true);
+            echo "</div>";
 
-                echo "<label for='filename'>File name</label>";
-                echo "<input name='filename' value='" . htmlentities($_FILES['file']['name'], ENT_QUOTES) . "' required>";
-                echo "<button type='submit' value='save'>Save file</button>";
+            echo "<div><button type='button' onclick='createRecord()'>Add new record</div>";
 
-                echo "<div id='fields' style='display: none;'>";
-                foreach ($fields as $key => $keyName) {
-                    echo "<input name='keys[{$key}]' value='" . htmlentities($keyName, ENT_QUOTES) . "' required>";
+            echo "<div id='records'>";
+            $iter = 0;
+            for ($iter; !feof($file); ++$iter) {
+                // input name will be record[iterator][keyname]
+                $name = "record[{$iter}]";
+                $record = fgetcsv($file);
+                // empty line
+                if (empty($record)) {
+                    break;
                 }
-                echo "</div>";
-
-                echo "<div><button type='button' onclick='createRecord()'>Add new record</div>";
-
-                echo "<div id='records'>";
-                $iter = 0;
-                for ($iter; !feof($file); ++$iter) {
-                    // input name will be record[iterator][keyname]
-                    $name = "record[{$iter}]";
-                    $record = fgetcsv($file);
-                    // empty line
-                    if (empty($record)) {
-                        break;
+                echo "<div class='csv-data' data-id='{$iter}'>";
+                for ($i = 0; $i < count($record); ++$i) {
+                    $recordName = "{$name}[{$fields[$i]}]";
+                    $current = $record[$i];
+                    if (isset($_POST['force_serialize']) and $fields[$i] == 'name') {
+                        $serialized = serialize(['zh' => $current]);
+                        $current = $serialized;
                     }
-                    echo "<div class='csv-data' data-id='{$iter}'>";
-                    for ($i = 0; $i < count($record); ++$i) {
-                        $recordName = "{$name}[{$fields[$i]}]";
-                        $current = $record[$i];
-                        echo "<strong>$fields[$i]: </strong>";
-                        if (preg_match($serialized_pattern, $current)) {
-                            $data = unserialize($current);
-                            echo "<div class='unserialized' data-serialize='$fields[$i]'>";
-                            $j = 0;
-                            foreach ($data as $key => $value) {
-                                echo "<section>";
-                                echo "<label>Key: </label>";
-                                echo "<input name='{$recordName}[{$j}][key]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($key, ENT_QUOTES) . "' required>";
-                                echo "<label>Value: </label>";
-                                echo "<input name='{$recordName}[{$j}][value]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($value, ENT_QUOTES) . "' required>";
-                                echo "<button type='button' onclick='removeItem(event)'>Remove</button>";
-                                echo "</section>";
-                                ++$j;
-                            }
-                            echo "</div>";
-                            // add new button
-                            echo
-                                "<div>
-                                    <button id='newArrField' type='button' onclick='addItemField(event)'>Add new</button>
-                                </div>";
-                        } else {
-                            echo "<input name='{$recordName}' value='" . htmlentities($current, ENT_QUOTES) . "' required>";
-                            echo "<br/>";
+                    echo "<strong>$fields[$i]: </strong>";
+                    if (preg_match($serialized_pattern, $current)) {
+                        $data = unserialize($current);
+                        echo "<div class='unserialized' data-serialize='$fields[$i]'>";
+                        $j = 0;
+                        foreach ($data as $key => $value) {
+                            echo "<section>";
+                            echo "<label>Key: </label>";
+                            echo "<input name='{$recordName}[{$j}][key]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($key, ENT_QUOTES) . "' required>";
+                            echo "<label>Value: </label>";
+                            echo "<input name='{$recordName}[{$j}][value]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($value, ENT_QUOTES) . "' required>";
+                            echo "<button type='button' onclick='removeItem(event)'>Remove</button>";
+                            echo "</section>";
+                            ++$j;
                         }
+                        echo "</div>";
+                        // add new button
+                        echo
+                            "<div>
+                                <button id='newArrField' type='button' onclick='addItemField(event)'>Add new</button>
+                            </div>";
+                    } else {
+                        echo "<input name='{$recordName}' value='" . htmlentities($current, ENT_QUOTES) . "' required>";
+                        echo "<br/>";
                     }
-                    echo "</div>";
                 }
                 echo "</div>";
-                fclose($file);
-
-                if ($iter) {
-                    echo "<div><button type='button' onclick='createRecord()'>Add new record</div>";
-                }
-            } catch (Exception $e) {
-                echo "<div class='error'>{$e->getMessage()}</div>";
             }
+            echo "</div>";
+            fclose($file);
+
+            if ($iter) {
+                echo "<div><button type='button' onclick='createRecord()'>Add new record</div>";
+            }
+        } catch (Exception $e) {
+            echo "<div class='error'>{$e->getMessage()}</div>";
         }
     }
     ?>
