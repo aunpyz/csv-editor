@@ -1,0 +1,35 @@
+html {
+    line-height: 1.5rem;
+}
+
+span[role="textbox"] {
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 1px 6px;
+    min-width: 1ch;
+    margin: 0 8px;
+}
+
+.csv-data {
+    border: 2px solid red;
+    margin: 8px;
+    padding: 8px;
+}
+
+.csv-data>.unserialized {
+    margin-left: 8px;
+}
+
+.fields-manipulator {
+    margin: 16px 0;
+    border: 2px solid Aqua;
+}
+
+thead {
+    background-color: Aquamarine;
+}
+
+tbody {
+    background-color: Azure;
+}
