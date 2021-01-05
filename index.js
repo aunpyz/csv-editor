@@ -240,11 +240,19 @@ const toggleFieldType = ({target}) => {
             if (!i) {
                 keyInput.focus();
             }
-
-            data.remove();
         } else {
             // serialized field
+            // this will only pick the first value input as a value for normal input
+            const ref = data.querySelector("section:first-of-type");
+            const input = newElement("input", null, [
+                {key: 'name', value: ref.dataset.name}
+            ]);
+            input.required = true;
+            input.value = ref.querySelector("input[name$='[value]']").value;
+            data.parentNode.insertBefore(input, data);
+            data.nextSibling.remove();
         }
+        data.remove();
     });
 }
 
