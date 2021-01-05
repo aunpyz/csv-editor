@@ -2,19 +2,10 @@
 <link rel="stylesheet" href="index.css">
 
 <form action="index.php" method="POST" enctype="multipart/form-data">
-    <div>
-        <label>
-            File: <input id="file" type="file" accept=".csv" name="file" onchange="resetLoadFileButton()">
-        </label>
-    </div>
-    <div>
-        <label>
-            <input id="force_serialize" type="checkbox" name="force_serialize"> Is Force Serialize?
-        </label>
-    </div>
-    <div>
-        <button id="file-open" type="submit" value="open">Open file</button>
-    </div>
+    <label>
+        File: <input id="file" type="file" accept=".csv" name="file" onchange="resetLoadFileButton()">
+    </label>
+    <button id="file-open" type="submit" value="open">Open file</button>
 </form>
 
 <form action="savefile.php" method="POST" enctype="multipart/form-data">
@@ -75,10 +66,6 @@
                 for ($i = 0; $i < count($record); ++$i) {
                     $recordName = "{$name}[{$fields[$i]}]";
                     $current = $record[$i];
-                    if (isset($_POST['force_serialize']) and $fields[$i] == 'name') {
-                        $serialized = serialize(['zh' => $current]);
-                        $current = $serialized;
-                    }
                     echo "<strong>$fields[$i]: </strong>";
                     if (preg_match($serialized_pattern, $current)) {
                         $data = unserialize($current);

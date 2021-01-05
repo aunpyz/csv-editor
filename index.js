@@ -135,10 +135,28 @@ const newField = () => {
     namedInput.name = namedInput.name.replace(/\d+/, parseInt(namedInput.name.match(/\d+/)[0]) + 1);
     tr.querySelectorAll("input").forEach(input => input.removeAttribute("value"));
     tbody.appendChild(tr);
+
+    // strong+input+br tags
+    document.querySelectorAll(".csv-data").forEach((csv, i) => {
+        const lastInputName = csv.querySelector("input:last-of-type").name;
+        const fieldName = lastInputName.match(/\[(\w*\s*)*\]$/);
+
+        csv.appendChild(newElement("strong", "[no name]: "));
+        const input = newElement("input", null, [
+            {key: 'name', value: `${lastInputName.substr(0, fieldName.index)}[no name]`}
+        ]);
+        input.required = true;
+        csv.appendChild(input);
+
+        csv.appendChild(newElement("br"));
+    });
+
+    tr.querySelector("input").focus();
 }
 const changeFieldName = ({target}) => {
     nthOfType = parseInt(target.name.match(/\d+/)[0]) + 1;
-    document.querySelectorAll(`.csv-data strong:nth-of-type(${nthOfType})`).forEach(strong => strong.textContent = `${target.value}: `);
+    document.querySelectorAll(`.csv-data strong:nth-of-type(${nthOfType})`)
+        .forEach(strong => strong.textContent = target.value ? `${target.value}: ` : '[no name]: ');
 }
 
 const loadFileButton = document.getElementById("file-open");
