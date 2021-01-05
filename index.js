@@ -139,7 +139,7 @@ const newField = () => {
     // strong+input+br tags
     document.querySelectorAll(".csv-data").forEach((csv, i) => {
         const lastInputName = csv.querySelector("input:last-of-type").name;
-        const fieldName = lastInputName.match(/\[(\w*\s*)*\]$/);
+        const fieldName = lastInputName.match(/\[[\w\s]+\]$/);
 
         csv.appendChild(newElement("strong", "[no name]: "));
         const input = newElement("input", null, [
@@ -156,7 +156,11 @@ const newField = () => {
 const changeFieldName = ({target}) => {
     nthOfType = parseInt(target.name.match(/\d+/)[0]) + 1;
     document.querySelectorAll(`.csv-data strong:nth-of-type(${nthOfType})`)
-        .forEach(strong => strong.textContent = target.value ? `${target.value}: ` : '[no name]: ');
+        .forEach(strong => {
+            const input = strong.nextSibling;
+            strong.textContent = target.value ? `${target.value}: ` : '[no name]: '
+            input.name = input.name.replace(/\[[\w\s]+\]$/, `[${target.value}]`);
+        });
 }
 
 const loadFileButton = document.getElementById("file-open");
