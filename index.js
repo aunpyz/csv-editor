@@ -158,20 +158,26 @@ const newField = () => {
     tr.querySelector("input").focus();
 }
 const changeFieldName = ({target}) => {
-    nthOfType = parseInt(target.name.match(/\d+/)[0]) + 1;
+    const nthOfType = parseInt(target.name.match(/\d+/)[0]) + 1;
+    const nameToApply = target.value ? target.value : 'no name';
     document.querySelectorAll(`.csv-data > div:nth-of-type(${nthOfType}) strong`)
         .forEach(strong => {
             const nextSibling = strong.nextSibling;
-            strong.textContent = target.value ? `${target.value}: ` : '[no name]: '
+            strong.textContent = target.value ? `${nameToApply}: ` : `[${nameToApply}]: `
             if (nextSibling.tagName.toUpperCase() === "INPUT") {
                 nextSibling.name = nextSibling.name
-                    .replace(/\[[\w\s]+\]$/, `[${target.value ? target.value : 'no name'}]`);
+                    .replace(/\[[\w\s]+\]$/, `[${nameToApply}]`);
             } else {
                 // serialized field
-                nextSibling.querySelectorAll("input").forEach(input => {
-                    input.name = input.name
-                        .replace(/^(record\[\d+\])\[[\w\s]+\]/, `$1[${target.value ? target.value : 'no name'}]`);
-                })
+                const regex = /^(record\[\d+\])\[[\w\s]+\]/;
+                nextSibling.querySelectorAll("section").forEach(section => {
+                    section.dataset.name = section.dataset.name
+                        .replace(regex, `$1[${nameToApply}]`)
+                    section.querySelectorAll("input").forEach(input => {
+                        input.name = input.name
+                            .replace(regex, `$1[${nameToApply}]`);
+                    });
+                });
             }
         });
 }
@@ -187,8 +193,7 @@ const toggleFieldType = ({target}) => {
                     .querySelector("td:first-of-type input:first-of-type")
                     .value;
             const div = newElement("div", null, [
-                {key: 'class', value: 'unserialized'},
-                {key: 'data-serialize', value: name}
+                {key: 'class', value: 'unserialized'}
             ]);
             const addButtonDiv = newElement("div");
             const section = newElement("secion", null, [

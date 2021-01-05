@@ -72,7 +72,7 @@
                     echo "<strong>$fields[$i]: </strong>";
                     if (preg_match($serialized_pattern, $current)) {
                         $data = unserialize($current);
-                        echo "<div class='unserialized' data-serialize='$fields[$i]'>";
+                        echo "<div class='unserialized'>";
                         $j = 0;
                         foreach ($data as $key => $value) {
                             echo "<section data-name='{$recordName}' data-item='{$j}'>";
