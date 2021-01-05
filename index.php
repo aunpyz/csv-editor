@@ -32,13 +32,14 @@
                 </thead>";
             echo "<tbody>";
             foreach ($fields as $key => $keyName) {
+                $nthOfType = $key + 1;
                 echo
                     "<tr>
                         <td>
                             <input name='keys[{$key}]' onkeyup='changeFieldName(event)' value='" . htmlentities($keyName, ENT_QUOTES) . "' required>
                         </td>
                         <td>
-                            <input type='checkbox'>
+                            <input type='checkbox' data-nth='{$nthOfType}' oninput='toggleFieldType(event)'>
                         </td>
                         <td>
                             <input disabled>
@@ -66,6 +67,8 @@
                 for ($i = 0; $i < count($record); ++$i) {
                     $recordName = "{$name}[{$fields[$i]}]";
                     $current = $record[$i];
+
+                    echo "<div>";
                     echo "<strong>$fields[$i]: </strong>";
                     if (preg_match($serialized_pattern, $current)) {
                         $data = unserialize($current);
@@ -85,12 +88,12 @@
                         // add new button
                         echo
                             "<div>
-                                <button id='newArrField' type='button' onclick='addItemField(event)'>Add new</button>
+                                <button class='newArrField' type='button' onclick='addItemField(event)'>Add new</button>
                             </div>";
                     } else {
                         echo "<input name='{$recordName}' value='" . htmlentities($current, ENT_QUOTES) . "' required>";
-                        echo "<br/>";
                     }
+                    echo "</div>";
                 }
                 echo "</div>";
             }

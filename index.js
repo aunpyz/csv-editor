@@ -71,7 +71,7 @@ const createRecord = () => {
         const lastRecord = document.querySelector("#records").lastChild;
         const newRecordId = parseInt(lastRecord.dataset.id) + 1;
         let newRecord = lastRecord.cloneNode(true);
-        let addArrFieldButton = newRecord.querySelector("#newArrField")
+        let addArrFieldButton = newRecord.querySelector(".newArrField")
         if (addArrFieldButton) {
             // only exist on array type field
             addArrFieldButton.disabled = true;
@@ -132,35 +132,112 @@ const newField = () => {
     const tbody = document.querySelector(".fields-manipulator table tbody");
     const tr = tbody.lastChild.cloneNode(true);
     const namedInput = tr.querySelector("input[name]");
+    const checkbox = tr.querySelector("input[type='checkbox']");
     namedInput.name = namedInput.name.replace(/\d+/, parseInt(namedInput.name.match(/\d+/)[0]) + 1);
+    namedInput.value = "";
+    checkbox.dataset.nth = parseInt(checkbox.dataset.nth) + 1;
+    checkbox.checked = false;
     tr.querySelectorAll("input").forEach(input => input.removeAttribute("value"));
     tbody.appendChild(tr);
 
-    // strong+input+br tags
     document.querySelectorAll(".csv-data").forEach((csv, i) => {
         const lastInputName = csv.querySelector("input:last-of-type").name;
         const fieldName = lastInputName.match(/\[[\w\s]+\]$/);
+        const div = newElement("div");
 
-        csv.appendChild(newElement("strong", "[no name]: "));
+        div.appendChild(newElement("strong", "[no name]: "));
         const input = newElement("input", null, [
             {key: 'name', value: `${lastInputName.substr(0, fieldName.index)}[no name]`}
         ]);
         input.required = true;
-        csv.appendChild(input);
+        div.appendChild(input);
 
-        csv.appendChild(newElement("br"));
+        csv.appendChild(div);
     });
 
     tr.querySelector("input").focus();
 }
 const changeFieldName = ({target}) => {
     nthOfType = parseInt(target.name.match(/\d+/)[0]) + 1;
-    document.querySelectorAll(`.csv-data strong:nth-of-type(${nthOfType})`)
+    document.querySelectorAll(`.csv-data > div:nth-of-type(${nthOfType}) strong`)
         .forEach(strong => {
-            const input = strong.nextSibling;
+            const nextSibling = strong.nextSibling;
             strong.textContent = target.value ? `${target.value}: ` : '[no name]: '
-            input.name = input.name.replace(/\[[\w\s]+\]$/, `[${target.value}]`);
+            if (nextSibling.tagName.toUpperCase() === "INPUT") {
+                nextSibling.name = nextSibling.name
+                    .replace(/\[[\w\s]+\]$/, `[${target.value ? target.value : 'no name'}]`);
+            } else {
+                // serialized field
+                nextSibling.querySelectorAll("input").forEach(input => {
+                    input.name = input.name
+                        .replace(/^(record\[\d+\])\[[\w\s]+\]/, `$1[${target.value ? target.value : 'no name'}]`);
+                })
+            }
         });
+}
+const toggleFieldType = ({target}) => {
+    document.querySelectorAll(`.csv-data > div:nth-of-type(${target.dataset.nth})`).forEach((field, i) => {
+        const data = field.querySelector(":nth-child(2)")
+        if (data.tagName.toUpperCase() === "INPUT") {
+            // init serialize type input
+            const dataVal = data.value;
+            const name = target
+                    .parentNode
+                    .parentNode
+                    .querySelector("td:first-of-type input:first-of-type")
+                    .value;
+            const div = newElement("div", null, [
+                {key: 'class', value: 'unserialized'},
+                {key: 'data-serialize', value: name}
+            ]);
+            const addButtonDiv = newElement("div");
+            const section = newElement("secion", null, [
+                {key: 'data-name', value: `record[0][${name}]`},
+                {key: 'data-item', value: 0}
+            ])
+            const keyInput = newElement("input", null, [
+                {key: 'name', value: `record[0][${name}][0][key]`},
+                {key: 'onkeyup', value: 'validateUnserializedFields(event)'},
+            ]);
+            const valueInput = newElement("input", null, [
+                {key: 'name', value: `record[0][${name}][0][value]`},
+                {key: 'onkeyup', value: 'validateUnserializedFields(event)'}
+            ]);
+            const addButton = newElement("button", "Add new", [
+                {key: 'type', value: 'button'},
+                {key: 'class', value: 'newArrField'},
+                {key: 'onclick', value: 'addItemField(event)'},
+            ]);
+            keyInput.required = true;
+            valueInput.required = true;
+            valueInput.value = dataVal;
+            addButton.disabled = true;
+
+            section.appendChild(newElement("label", "Key: "));
+            section.appendChild(keyInput);
+            section.appendChild(newElement("label", "Value: "));
+            section.appendChild(valueInput);
+            section.appendChild(newElement("button", "Remove", [
+                {key: 'type', value: 'button'},
+                {key: 'onclick', value: 'removeItem(event)'},
+            ]))
+            div.appendChild(section);
+            addButtonDiv.appendChild(addButton);
+            data.parentNode
+                .insertBefore(div, data)
+                .parentNode
+                .insertBefore(addButtonDiv, data);
+            
+            // only focus the first key input
+            if (!i) {
+                keyInput.focus();
+            }
+
+            data.remove();
+        } else {
+            // serialized field
+        }
+    });
 }
 
 const loadFileButton = document.getElementById("file-open");
