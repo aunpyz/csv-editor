@@ -20,7 +20,10 @@ const addItemField = ({
     const currentLastChild = sibling.lastChild;
     const [name, item] = [currentLastChild.dataset.name, parseInt(currentLastChild.dataset.item) + 1];
     const newName = `${name}[${item}]`;
-    const section = newElement("section");
+    const section = newElement("section", null, [
+        {key: 'data-name', value: name},
+        {key: 'data-item', value: item}
+    ]);
     section.appendChild(newElement("label", "Key: "));
     section.appendChild(newElement("input", null, [{
             key: 'name',
