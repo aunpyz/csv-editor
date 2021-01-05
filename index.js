@@ -89,7 +89,7 @@ const createRecord = () => {
         document.getElementById("records").appendChild(newRecord);
         newRecord.querySelector("input").focus();
     } else {
-        const fieldsContainer = document.querySelector("#fields");
+        const fieldsContainer = document.querySelector("#fields tbody");
         const record = newElement("div", null, [{
                 key: 'class',
                 value: 'csv-data'
@@ -99,7 +99,7 @@ const createRecord = () => {
                 value: 0
             }
         ]);
-        fieldsContainer.querySelectorAll("input")
+        fieldsContainer.querySelectorAll("tr td:first-of-type input")
             .forEach(field => {
                 const div = newElement("div");
                 const strong = newElement("strong", `${field.value}: `)
