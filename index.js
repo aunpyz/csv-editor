@@ -255,8 +255,18 @@ const toggleFieldType = ({target}) => {
         data.remove();
     });
 }
+const markFieldType = () => {
+    const checkboxes = document.querySelectorAll("tbody tr td:nth-of-type(2) input[type='checkbox']");
+    document.querySelectorAll(".csv-data:first-of-type > div").forEach((field, i) => {
+        const data = field.querySelector(":nth-child(2)");
+        if (data.tagName.toUpperCase() === "DIV") {
+            checkboxes[i].checked = true;
+        }
+    })
+}
 
 const loadFileButton = document.getElementById("file-open");
 const file = document.getElementById("file");
 
 resetLoadFileButton();
+markFieldType();
