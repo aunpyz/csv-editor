@@ -62,7 +62,7 @@
                         echo "<div class='unserialized' data-serialize='$fields[$i]'>";
                         $j = 0;
                         foreach ($data as $key => $value) {
-                            echo "<section>";
+                            echo "<section data-name='{$recordName}' data-item='{$j}'>";
                             echo "<label>Key: </label>";
                             echo "<input name='{$recordName}[{$j}][key]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($key, ENT_QUOTES) . "' required>";
                             echo "<label>Value: </label>";
