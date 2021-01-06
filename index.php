@@ -19,7 +19,7 @@
             $id_idx = array_search("id", $fields, true);
 
             echo "<label for='filename'>File name</label>";
-            echo "<input name='filename' value='" . htmlentities($_FILES['file']['name'], ENT_QUOTES) . "' required>";
+            echo "<input name='filename' value='" . htmlentities($_FILES['file']['name'], ENT_QUOTES) . "'>";
             echo "<button type='submit' value='save'>Save file</button>";
 
             echo "<div class='fields-manipulator'>";
@@ -36,7 +36,7 @@
                 echo
                     "<tr>
                         <td>
-                            <input name='keys[{$key}]' onkeyup='changeFieldName(event)' value='" . htmlentities($keyName, ENT_QUOTES) . "' required>
+                            <input name='keys[{$key}]' onkeyup='changeFieldName(event)' value='" . htmlentities($keyName, ENT_QUOTES) . "'>
                         </td>
                         <td>
                             <input type='checkbox' data-nth='{$nthOfType}' oninput='toggleFieldType(event)'>
@@ -77,9 +77,9 @@
                         foreach ($data as $key => $value) {
                             echo "<section data-name='{$recordName}' data-item='{$j}'>";
                             echo "<label>Key: </label>";
-                            echo "<input name='{$recordName}[{$j}][key]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($key, ENT_QUOTES) . "' required>";
+                            echo "<input name='{$recordName}[{$j}][key]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($key, ENT_QUOTES) . "'>";
                             echo "<label>Value: </label>";
-                            echo "<input name='{$recordName}[{$j}][value]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($value, ENT_QUOTES) . "' required>";
+                            echo "<input name='{$recordName}[{$j}][value]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($value, ENT_QUOTES) . "'>";
                             echo "<button type='button' onclick='removeItem(event)'>Remove</button>";
                             echo "</section>";
                             ++$j;
@@ -91,7 +91,7 @@
                                 <button class='newArrField' type='button' onclick='addItemField(event)'>Add new</button>
                             </div>";
                     } else {
-                        echo "<input name='{$recordName}' value='" . htmlentities($current, ENT_QUOTES) . "' required>";
+                        echo "<input name='{$recordName}' value='" . htmlentities($current, ENT_QUOTES) . "'>";
                     }
                     echo "</div>";
                 }

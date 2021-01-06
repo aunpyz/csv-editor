@@ -49,7 +49,6 @@ const addItemField = ({
         value: "removeItem(event)"
     }]));
 
-    section.querySelectorAll("input").forEach(input => input.required = true);
     sibling.appendChild(section);
     target.disabled = true;
 };
@@ -107,7 +106,6 @@ const createRecord = () => {
                     key: 'name',
                     value: `record[0][${field.value}]`
                 }]);
-                input.required = true;
 
                 div.appendChild(strong);
                 div.appendChild(input);
@@ -152,7 +150,6 @@ const newField = () => {
         const input = newElement("input", null, [
             {key: 'name', value: `${lastInputName.substr(0, fieldName.index)}[no name]`}
         ]);
-        input.required = true;
         div.appendChild(input);
 
         csv.appendChild(div);
@@ -216,8 +213,6 @@ const toggleFieldType = ({target}) => {
                 {key: 'class', value: 'newArrField'},
                 {key: 'onclick', value: 'addItemField(event)'},
             ]);
-            keyInput.required = true;
-            valueInput.required = true;
             valueInput.value = dataVal;
             addButton.disabled = true;
 
@@ -247,7 +242,6 @@ const toggleFieldType = ({target}) => {
             const input = newElement("input", null, [
                 {key: 'name', value: ref.dataset.name}
             ]);
-            input.required = true;
             input.value = ref.querySelector("input[name$='[value]']").value;
             data.parentNode.insertBefore(input, data);
             data.nextSibling.remove();
