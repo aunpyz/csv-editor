@@ -60,7 +60,7 @@
                 $name = "record[{$iter}]";
                 $record = fgetcsv($file);
                 // empty line
-                if (empty($record)) {
+                if (count($record) < count($fields)) {
                     break;
                 }
                 echo "<div class='csv-data' data-id='{$iter}'>";
