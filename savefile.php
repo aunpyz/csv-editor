@@ -3,7 +3,7 @@
 <?php
     try {
         if($_POST) {
-            $out = fopen($_POST["filename"], "w");
+            $out = fopen("php://output", "w");
             fputcsv($out, $_POST["keys"]);
             foreach ($_POST["record"] as $r) {
                 $values = array_map(function($each) {
@@ -13,7 +13,9 @@
             }
             fclose($out);
 
-            echo "<div class='success'>File saved successfully</div>";
+            header("Content-Type: application/octet-stream");
+            header("Content-Disposition: attachment; filename={$_POST['filename']}");
+            readfile($_POST["filename"]);
         }
     } catch (Exception $e) {
         echo "<div class='error'>{$e->getMessage()}</div>";
