@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="./color.css">
-
 <?php
     try {
         if($_POST) {
@@ -15,9 +13,10 @@
 
             header("Content-Type: application/octet-stream");
             header("Content-Disposition: attachment; filename={$_POST['filename']}");
-            readfile($_POST["filename"]);
         }
     } catch (Exception $e) {
+        echo "<link rel='stylesheet' href='./color.css'>";
+
         echo "<div class='error'>{$e->getMessage()}</div>";
     }
 
