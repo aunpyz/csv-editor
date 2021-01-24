@@ -79,7 +79,10 @@ const createRecord = () => {
             addArrFieldButton.disabled = true;
         }
         newRecord.dataset.id = newRecordId;
-        newRecord.querySelector("input[name$='[id]']").value = newRecordId + 1;
+        const id = newRecord.querySelector("input[name$='[id]']")
+        if (id) {
+            id.value = newRecordId + 1;
+        }
         newRecord.querySelectorAll("input[name$='[key]'").forEach(i => i.value = i.value);
         newRecord.querySelectorAll("input").forEach(input => {
             input.removeAttribute("value");
