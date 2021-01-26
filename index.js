@@ -3,18 +3,7 @@ const changeKeyName = ({target}) => {
     const nameWithoutRecordNo = target.name.split(/(?<=record\[)\d+(?=\])/);
     const value = target.value;
     document.querySelectorAll('[data-id]')
-        .forEach(record => record.querySelector(`[name='${nameWithoutRecordNo.join(record.dataset.id)}']`).value = value)
-}
-const validateUnserializedFields = ({
-    target
-}) => {
-    const button = target.parentNode.parentNode.nextSibling.querySelector('button');
-    const fields = [...target.parentNode.parentNode.getElementsByTagName('input')].filter(el => !el.value);
-    if (fields.length) {
-        button.disabled = true;
-    } else {
-        button.disabled = false;
-    }
+        .forEach(record => record.querySelector(`[name='${nameWithoutRecordNo.join(record.dataset.id)}']`).value = value);
 }
 const removeItem = ({
     target
@@ -23,40 +12,32 @@ const addItemField = ({
     target
 }) => {
     const sibling = target.parentNode.previousSibling;
-    const currentLastChild = sibling.lastChild;
-    const [name, item] = [currentLastChild.dataset.name, parseInt(currentLastChild.dataset.item) + 1];
-    const newName = `${name}[${item}]`;
-    const section = newElement("section", null, [
-        {key: 'data-name', value: name},
-        {key: 'data-item', value: item}
-    ]);
-    section.appendChild(newElement("label", "Key: "));
-    section.appendChild(newElement("input", null, [{
-            key: 'name',
-            value: `${newName}[key]`
-        },
-        {
-            key: 'onkeyup',
-            value: 'validateUnserializedFields(event)'
-        }
-    ]));
-    section.appendChild(newElement("label", "Value: "));
-    section.appendChild(newElement("input", null, [{
-            key: 'name',
-            value: `${newName}[value]`
-        },
-        {
-            key: 'onkeyup',
-            value: 'validateUnserializedFields(event)'
-        }
-    ]));
-    section.appendChild(newElement("button", "Remove", [{
-        key: "onclick",
-        value: "removeItem(event)"
-    }]));
+    document.querySelectorAll(`[data-name='${sibling.dataset.name}']`).forEach(serialized => {
+        const currentLastChild = serialized.lastChild;
+        const [name, item] = [currentLastChild.dataset.name, parseInt(currentLastChild.dataset.item) + 1];
+        const newName = `${name}[${item}]`;
+        const section = newElement("section", null, [
+            {key: 'data-name', value: name},
+            {key: 'data-item', value: item}
+        ]);
+        section.appendChild(newElement("label", "Key: "));
+        section.appendChild(newElement("input", null, [
+            {key: 'name',value: `${newName}[key]`},
+            {key: 'onkeyup', value: 'changeKeyName(event)'}
+        ]));
+        section.appendChild(newElement("label", "Value: "));
+        section.appendChild(newElement("input", null, [{
+                key: 'name',
+                value: `${newName}[value]`
+            }
+        ]));
+        section.appendChild(newElement("button", "Remove", [{
+            key: "onclick",
+            value: "removeItem(event)"
+        }]));
 
-    sibling.appendChild(section);
-    target.disabled = true;
+        serialized.appendChild(section);
+    });
 };
 const newElement = (type, text, attributes) => {
     elm = document.createElement(type);
@@ -192,8 +173,9 @@ const changeFieldName = ({target}) => {
 }
 const toggleFieldType = ({target}) => {
     document.querySelectorAll(`.csv-data > div:nth-of-type(${target.dataset.nth})`).forEach((field, i) => {
-        const data = field.querySelector(":nth-child(2)")
+        const data = field.querySelector(":nth-child(2)");
         if (data.tagName.toUpperCase() === "INPUT") {
+            const recordNo = field.parentNode.dataset.id;
             // init serialize type input
             const dataVal = data.value;
             const name = target
@@ -202,20 +184,20 @@ const toggleFieldType = ({target}) => {
                     .querySelector("td:first-of-type input:first-of-type")
                     .value;
             const div = newElement("div", null, [
-                {key: 'class', value: 'unserialized'}
+                {key: 'class', value: 'unserialized'},
+                {key: 'data-name', value: name}
             ]);
             const addButtonDiv = newElement("div");
-            const section = newElement("secion", null, [
-                {key: 'data-name', value: `record[0][${name}]`},
+            const section = newElement("section", null, [
+                {key: 'data-name', value: `record[${recordNo}][${name}]`},
                 {key: 'data-item', value: 0}
             ])
             const keyInput = newElement("input", null, [
-                {key: 'name', value: `record[0][${name}][0][key]`},
-                {key: 'onkeyup', value: 'validateUnserializedFields(event)'},
+                {key: 'name', value: `record[${recordNo}][${name}][0][key]`},
+                {key: 'onkeyup', value: 'changeKeyName(event)'}
             ]);
             const valueInput = newElement("input", null, [
-                {key: 'name', value: `record[0][${name}][0][value]`},
-                {key: 'onkeyup', value: 'validateUnserializedFields(event)'}
+                {key: 'name', value: `record[${recordNo}][${name}][0][value]`}
             ]);
             const addButton = newElement("button", "Add new", [
                 {key: 'type', value: 'button'},
@@ -223,7 +205,6 @@ const toggleFieldType = ({target}) => {
                 {key: 'onclick', value: 'addItemField(event)'},
             ]);
             valueInput.value = dataVal;
-            addButton.disabled = true;
 
             section.appendChild(newElement("label", "Key: "));
             section.appendChild(keyInput);

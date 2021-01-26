@@ -72,14 +72,14 @@
                     echo "<strong>$fields[$i]: </strong>";
                     if (preg_match($serialized_pattern, $current)) {
                         $data = unserialize($current);
-                        echo "<div class='unserialized'>";
+                        echo "<div class='unserialized' data-name='{$fields[$i]}'>";
                         $j = 0;
                         foreach ($data as $key => $value) {
                             echo "<section data-name='{$recordName}' data-item='{$j}'>";
                             echo "<label>Key: </label>";
                             echo "<input name='{$recordName}[{$j}][key]' onkeyup='changeKeyName(event)' value='" . htmlentities($key, ENT_QUOTES) . "'>";
                             echo "<label>Value: </label>";
-                            echo "<input name='{$recordName}[{$j}][value]' onkeyup='validateUnserializedFields(event)' value='" . htmlentities($value, ENT_QUOTES) . "'>";
+                            echo "<input name='{$recordName}[{$j}][value]' value='" . htmlentities($value, ENT_QUOTES) . "'>";
                             echo "<button type='button' onclick='removeItem(event)'>Remove</button>";
                             echo "</section>";
                             ++$j;
