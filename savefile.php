@@ -1,6 +1,9 @@
 <?php
     try {
         if($_POST) {
+            header("Content-Type: application/csv; charset=UTF-8'");
+            header("Content-Disposition: attachment; filename={$_POST['filename']}");
+            
             $out = fopen("php://output", "w");
             fputcsv($out, $_POST["keys"]);
             foreach ($_POST["record"] as $r) {
@@ -10,9 +13,6 @@
                 fputcsv($out, $values);
             }
             fclose($out);
-
-            header("Content-Type: application/octet-stream");
-            header("Content-Disposition: attachment; filename={$_POST['filename']}");
         }
     } catch (Exception $e) {
         echo "<link rel='stylesheet' href='./color.css'>";
