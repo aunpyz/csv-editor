@@ -1,4 +1,10 @@
 const resetLoadFileButton = () => loadFileButton.disabled = !file.value;
+const changeKeyName = ({target}) => {
+    const nameWithoutRecordNo = target.name.split(/(?<=record\[)\d+(?=\])/);
+    const value = target.value;
+    document.querySelectorAll('[data-id]')
+        .forEach(record => record.querySelector(`[name='${nameWithoutRecordNo.join(record.dataset.id)}']`).value = value)
+}
 const validateUnserializedFields = ({
     target
 }) => {
