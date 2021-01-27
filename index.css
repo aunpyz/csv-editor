@@ -2,6 +2,10 @@ html {
     line-height: 1.5rem;
 }
 
+html form {
+	margin-bottom: 16px;
+}
+
 .csv-data {
     border: 2px solid red;
     margin: 8px;
