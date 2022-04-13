@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 PORT=8000
 while getopts p: option
 do

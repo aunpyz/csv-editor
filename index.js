@@ -11,9 +11,9 @@ const removeItem = ({
 const addItemField = ({
     target
 }) => {
-    const sibling = target.parentNode.previousSibling;
+    const sibling = target.parentNode.parentNode.querySelector('div:first-of-type');
     document.querySelectorAll(`[data-name='${sibling.dataset.name}']`).forEach(serialized => {
-        const currentLastChild = serialized.lastChild;
+        const currentLastChild = serialized.querySelector('section:last-child');
         const [name, item] = [currentLastChild.dataset.name, parseInt(currentLastChild.dataset.item) + 1];
         const newName = `${name}[${item}]`;
         const section = newElement("section", null, [
@@ -57,7 +57,7 @@ const newElement = (type, text, attributes) => {
 }
 const createRecord = () => {
     if (document.querySelector("#records .csv-data")) {
-        const lastRecord = document.querySelector("#records").lastChild;
+        const lastRecord = document.querySelector("#records > div.csv-data:last-of-type");
         const newRecordId = parseInt(lastRecord.dataset.id) + 1;
         let newRecord = lastRecord.cloneNode(true);
         let addArrFieldButton = newRecord.querySelector(".newArrField")
@@ -121,7 +121,7 @@ const createRecord = () => {
 }
 const newField = () => {
     const tbody = document.querySelector(".fields-manipulator table tbody");
-    const tr = tbody.lastChild.cloneNode(true);
+    const tr = tbody.querySelector("tr:last-of-type").cloneNode(true);
     const namedInput = tr.querySelector("input[name]");
     const checkbox = tr.querySelector("input[type='checkbox']");
     namedInput.name = namedInput.name.replace(/\d+/, parseInt(namedInput.name.match(/\d+/)[0]) + 1);

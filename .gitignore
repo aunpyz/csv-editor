@@ -1,2 +1,7 @@
 .DS_Store
 *.csv
+.vscode
+cache/
+configs/
+templates_c/
+vendor/

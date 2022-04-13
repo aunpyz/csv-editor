@@ -1,0 +1,8 @@
+{
+    "require": {
+        "smarty/smarty": "^4.1"
+    },
+    "scripts": {
+        "dev": "./serve.sh"
+    }
+}
