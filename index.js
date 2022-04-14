@@ -1,44 +1,3 @@
-const resetLoadFileButton = () => loadFileButton.disabled = !file.value;
-const changeKeyName = ({target}) => {
-    const nameWithoutRecordNo = target.name.split(/(?<=record\[)\d+(?=\])/);
-    const value = target.value;
-    document.querySelectorAll('[data-id]')
-        .forEach(record => record.querySelector(`[name='${nameWithoutRecordNo.join(record.dataset.id)}']`).value = value);
-}
-const removeItem = ({
-    target
-}) => target.parentNode.remove();
-const addItemField = ({
-    target
-}) => {
-    const sibling = target.parentNode.parentNode.querySelector('div:first-of-type');
-    document.querySelectorAll(`[data-name='${sibling.dataset.name}']`).forEach(serialized => {
-        const currentLastChild = serialized.querySelector('section:last-child');
-        const [name, item] = [currentLastChild.dataset.name, parseInt(currentLastChild.dataset.item) + 1];
-        const newName = `${name}[${item}]`;
-        const section = newElement("section", null, [
-            {key: 'data-name', value: name},
-            {key: 'data-item', value: item}
-        ]);
-        section.appendChild(newElement("label", "Key: "));
-        section.appendChild(newElement("input", null, [
-            {key: 'name',value: `${newName}[key]`},
-            {key: 'onkeyup', value: 'changeKeyName(event)'}
-        ]));
-        section.appendChild(newElement("label", "Value: "));
-        section.appendChild(newElement("input", null, [{
-                key: 'name',
-                value: `${newName}[value]`
-            }
-        ]));
-        section.appendChild(newElement("button", "Remove", [{
-            key: "onclick",
-            value: "removeItem(event)"
-        }]));
-
-        serialized.appendChild(section);
-    });
-};
 const newElement = (type, text, attributes) => {
     elm = document.createElement(type);
     if (text) {
@@ -54,98 +13,6 @@ const newElement = (type, text, attributes) => {
     }
 
     return elm;
-}
-const createRecord = () => {
-    if (document.querySelector("#records .csv-data")) {
-        const lastRecord = document.querySelector("#records > div.csv-data:last-of-type");
-        const newRecordId = parseInt(lastRecord.dataset.id) + 1;
-        let newRecord = lastRecord.cloneNode(true);
-        let addArrFieldButton = newRecord.querySelector(".newArrField")
-        if (addArrFieldButton) {
-            // only exist on array type field
-            addArrFieldButton.disabled = true;
-        }
-        newRecord.dataset.id = newRecordId;
-        const id = newRecord.querySelector("input[name$='[id]']")
-        if (id) {
-            id.value = newRecordId + 1;
-        }
-        newRecord.querySelectorAll("input[name$='[key]'").forEach(i => i.value = i.value);
-        newRecord.querySelectorAll("input").forEach(input => {
-            input.removeAttribute("value");
-            input.name = input.name.replace(/record\[\d+\]/, `record[${newRecordId}]`);
-        });
-        document.getElementById("records").appendChild(newRecord);
-        newRecord.querySelector("input").focus();
-    } else {
-        const fieldsContainer = document.querySelector("#fields tbody");
-        const record = newElement("div", null, [{
-                key: 'class',
-                value: 'csv-data'
-            },
-            {
-                key: 'data-id',
-                value: 0
-            }
-        ]);
-        fieldsContainer.querySelectorAll("tr td:first-of-type input")
-            .forEach(field => {
-                const div = newElement("div");
-                const strong = newElement("strong", `${field.value}: `)
-                const input = newElement("input", null, [{
-                    key: 'name',
-                    value: `record[0][${field.value}]`
-                }]);
-
-                div.appendChild(strong);
-                div.appendChild(input);
-
-                record.appendChild(div);
-            });
-        document.getElementById("records").appendChild(record)
-            .parentNode
-            .parentNode
-            .appendChild(newElement("button", "Add new record", [{
-                    key: 'type',
-                    value: 'button'
-                },
-                {
-                    key: 'onclick',
-                    value: 'createRecord()'
-                }
-            ]));
-        const idInput = record.querySelector("input");
-        idInput.value = 1;
-        idInput.focus();
-    }
-}
-const newField = () => {
-    const tbody = document.querySelector(".fields-manipulator table tbody");
-    const tr = tbody.querySelector("tr:last-of-type").cloneNode(true);
-    const namedInput = tr.querySelector("input[name]");
-    const checkbox = tr.querySelector("input[type='checkbox']");
-    namedInput.name = namedInput.name.replace(/\d+/, parseInt(namedInput.name.match(/\d+/)[0]) + 1);
-    namedInput.value = "";
-    checkbox.dataset.nth = parseInt(checkbox.dataset.nth) + 1;
-    checkbox.checked = false;
-    tr.querySelectorAll("input").forEach(input => input.removeAttribute("value"));
-    tbody.appendChild(tr);
-
-    document.querySelectorAll(".csv-data").forEach((csv, i) => {
-        const lastInputName = csv.querySelector("input:last-of-type").name;
-        const fieldName = lastInputName.match(/\[[\w\s]+\]$/);
-        const div = newElement("div");
-
-        div.appendChild(newElement("strong", "[no name]: "));
-        const input = newElement("input", null, [
-            {key: 'name', value: `${lastInputName.substr(0, fieldName.index)}[no name]`}
-        ]);
-        div.appendChild(input);
-
-        csv.appendChild(div);
-    });
-
-    tr.querySelector("input").focus();
 }
 const changeFieldName = ({target}) => {
     const nthOfType = parseInt(target.name.match(/\d+/)[0]) + 1;
@@ -194,7 +61,6 @@ const toggleFieldType = ({target}) => {
             ])
             const keyInput = newElement("input", null, [
                 {key: 'name', value: `record[${recordNo}][${name}][0][key]`},
-                {key: 'onkeyup', value: 'changeKeyName(event)'}
             ]);
             const valueInput = newElement("input", null, [
                 {key: 'name', value: `record[${recordNo}][${name}][0][value]`}
@@ -202,7 +68,6 @@ const toggleFieldType = ({target}) => {
             const addButton = newElement("button", "Add new", [
                 {key: 'type', value: 'button'},
                 {key: 'class', value: 'newArrField'},
-                {key: 'onclick', value: 'addItemField(event)'},
             ]);
             valueInput.value = dataVal;
 
@@ -212,7 +77,6 @@ const toggleFieldType = ({target}) => {
             section.appendChild(valueInput);
             section.appendChild(newElement("button", "Remove", [
                 {key: 'type', value: 'button'},
-                {key: 'onclick', value: 'removeItem(event)'},
             ]))
             div.appendChild(section);
             addButtonDiv.appendChild(addButton);
@@ -239,18 +103,133 @@ const toggleFieldType = ({target}) => {
         data.remove();
     });
 }
-const markFieldType = () => {
-    const checkboxes = document.querySelectorAll("tbody tr td:nth-of-type(2) input[type='checkbox']");
-    document.querySelectorAll(".csv-data:first-of-type > div").forEach((field, i) => {
-        const data = field.querySelector(":nth-child(2)");
-        if (data.tagName.toUpperCase() === "DIV") {
-            checkboxes[i].checked = true;
+
+$(function() {
+    const $file = $('#file')
+    const $loadFileButton = $('#file-open')
+
+    // utils
+    const increment = function(d) {
+        return Number(d) + 1
+    }
+
+    // functions
+    const markFieldType = function() {
+        const checkboxes = $(`tbody tr td:nth-of-type(2) input[type='checkbox']`)
+        $('.csv-data:first-of-type > div').each(function(i, field) {
+            if ($(field).find('div:nth-child(2)').length) {
+                $(checkboxes[i]).attr('checked', true)
+            }
+        })
+    }
+    const resetLoadFileButton = function() {
+        console.log($file.prop('value'))
+        $loadFileButton.attr('disabled', !$file.prop('value'))
+    }
+    const appendFields = function() {
+        $('.csv-data').each(function(_i, csv) {
+            const lastInputName = $(csv).find('input:last-of-type').prop('name')
+            const $div = $('<div></div>')
+            const $input = $('<input>').attr('name', lastInputName.replace(/\[[\w\s]+\]$/, '[no name]'))
+            $div.append('<strong>[no name]: </strong>', $input)
+            $(csv).append($div)
+        })
+    }
+
+    // listeners
+    $(document).on('click', '.fields-manipulator>button', function() {
+        const $tbody = $('.fields-manipulator tbody')
+        const $tr = $tbody.find('tr:last-of-type').clone()
+        const $namedInput = $tr.find('input[name]')
+        const $checkbox = $tr.find(`input[type='checkbox']`)
+        $namedInput
+            .prop('value', '')
+            .attr('name', $namedInput.prop('name').replace(/\d+/, increment))
+        $checkbox
+            .prop('checked', false)
+            .attr('data-nth', increment($checkbox.data('nth')))
+        $tr.find('input').each(function(_i, input) { $(input).removeAttr('value') })
+        $tbody.append($tr)
+        $tr.find('input').first().focus()
+        appendFields()
+    })
+    $(document).on('keyup', '.unserialized input:first-of-type', function(event) {
+        const $target = $(event.target)
+        const nameWithoutRecordNo = $target.prop('name').split(/(?<=record\[)\d+(?=\])/);
+        const value = $target.prop('value')
+        $('[data-id]').each(function(_i, record) {
+            $(record).find(`[name='${nameWithoutRecordNo.join($(record).data('id'))}']`).val(value)
+        })
+    })
+    $(document).on('click', '.unserialized button', function(event) {
+        $(event.target).parent().remove()
+    })
+    $(document).on('click', '.new-arr-field', function(event) {
+        const $sibling = $(event.target).parent().parent().find('div:first-of-type')
+        $(`div[data-name='${$sibling.data('name')}']`).each(function(_i, serialized) {
+            const $lastChild = $(serialized).find('section:last-child')
+            const [name, item] = [$lastChild.data('name'), increment($lastChild.data('item'))]
+            const newName = `${name}[${item}]`
+            const $section = $('<section></section>').attr({
+                'data-name': name,
+                'data-item': item,
+            })
+            const $keyInput = $('<input>').attr('name', `${newName}[key]`)
+            const $valueInput = $('<input>').attr('name', `${newName}[value]`)
+            $section.append(
+                '<label>Key: </label>',
+                $keyInput,
+                '<label>Value: </label>',
+                $valueInput,
+                $('<button>Remove</button>').prop('type', 'button'),
+            )
+            $(serialized).append($section)
+        })
+    })
+    $('#new-record').on('click', function() {
+        $records = $('#records')
+        $lastRecord = $records.find('div.csv-data:last-of-type')
+        if ($lastRecord.length) {
+            console.log($lastRecord)
+            const newRecordId = increment($lastRecord.data('id'))
+            console.log(newRecordId)
+            const $newRecord = $lastRecord.clone()
+            $newRecord.attr('data-id', newRecordId)
+            $newRecord.find('.new-arr-field').prop('disabled', true)
+            $newRecord.find(`input:not([name$='[id]'],[name$='[key]'])`).each(function(_i, input) {
+                $(input).prop('value', '')
+            })
+            $newRecord.find('input').each(function(_i, input) {
+                $(input).attr('name', $(input).attr('name').replace(/(?<=record\[)\d+(?=\])/, newRecordId))
+            })
+            $newRecord.find('div.unserialized>section').each(function(_i, section) {
+                $(section).attr('data-name', $(section).data('name').replace(/(?<=record\[)\d+(?=\])/, newRecordId))
+            })
+            $newRecord.find(`input[name$='[id]'`).prop('value', increment(newRecordId))
+            $records.append($newRecord)
+            $newRecord.find('input').first().focus()
+        }
+        else {
+            const $fieldsContainer = $('#fields tbody')
+            const $record = $('<div></div>').attr({
+                'class': 'csv-data',
+                'data-id': 0,
+            })
+            $fieldsContainer.find('tr td:first-of-type input').each(function(_i, field) {
+                $record.append(
+                    $('<div></div>').append(
+                        `<strong>${$(field).val()}: </strong>`,
+                        $('<input>').attr('name', `record[0][${$(field).val()}]`),
+                    )
+                )
+            })
+            $('#records').append($record)
+            $record.find(`input[name$='[id]'`).val(1).focus()
         }
     })
-}
+    $file.on('change', resetLoadFileButton)
 
-const loadFileButton = document.getElementById("file-open");
-const file = document.getElementById("file");
-
-resetLoadFileButton();
-markFieldType();
+    // initializes
+    markFieldType()
+    resetLoadFileButton()
+})

@@ -6,7 +6,7 @@
 {block 'main'}
     <form action='index.php' method='POST' enctype='multipart/form-data'>
         <label>
-            File: <input id='file' type='file' accept='.csv' name='file' onchange='resetLoadFileButton()'>
+            File: <input id='file' type='file' accept='.csv' name='file'>
         </label>
         <button id='file-open' type='submit' value='open'>Open file</button>
     </form>
@@ -45,10 +45,10 @@
                     {/foreach}
                     </tbody>
                 </table>
-                <button type='button' onclick='newField()'>Add new field</button>
+                <button type='button'>Add new field</button>
             </div>
             <div>
-                <button type='button' onclick='createRecord()'>Add new record</button>
+                <button id='new-record' type='button'>Add new record</button>
             </div>
             <div id='records'>
                 {$iter=0}
@@ -68,15 +68,15 @@
                                                 {$extended_record_name=$record_name|cat:'['|cat:$data_lang@index|cat:']'}
                                                 <section data-name='{$record_name}' data-item='{$data_lang@index}'>
                                                     <label>Key: </label>
-                                                    <input name='{$extended_record_name|cat:'[key]'}' onkeyup='changeKeyName(event)' value='{$key}'>
+                                                    <input name='{$extended_record_name|cat:'[key]'}' value='{$key}'>
                                                     <label>Value: </label>
                                                     <input name='{$extended_record_name|cat:'[value]'}' value='{$data_lang}'>
-                                                    <button type='button' onclick='removeItem(event)'>Remove</button>
+                                                    <button type='button'>Remove</button>
                                                 </section>
                                             {/foreach}
                                         </div>
                                         <div>
-                                            <button class='newArrField' type='button' onclick='addItemField(event)'>Add new</button>
+                                            <button class='new-arr-field' type='button'>Add new</button>
                                         </div>
                                     {else}
                                         <input name='{$record_name}' value='{$field}'>
@@ -91,5 +91,6 @@
     {/if}
 {/block}
 {block 'js'}
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js' integrity='sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==' crossorigin='anonymous' referrerpolicy='no-referrer'></script>
     <script type='text/javascript' src='index.js'></script>
 {/block}
