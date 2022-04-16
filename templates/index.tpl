@@ -33,7 +33,7 @@
                         {$nthOfType=$key+1}
                         <tr>
                             <td>
-                                <input name='keys[{$key}]' onkeyup='changeFieldName(event)' value='{$key_name}'>
+                                <input name='keys[{$key}]' value='{$key_name}'>
                             </td>
                             <td>
                                 <input type='checkbox' data-nth='{$nthOfType}' oninput='toggleFieldType(event)'>

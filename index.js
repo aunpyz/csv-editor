@@ -14,30 +14,6 @@ const newElement = (type, text, attributes) => {
 
     return elm;
 }
-const changeFieldName = ({target}) => {
-    const nthOfType = parseInt(target.name.match(/\d+/)[0]) + 1;
-    const nameToApply = target.value ? target.value : 'no name';
-    document.querySelectorAll(`.csv-data > div:nth-of-type(${nthOfType}) strong`)
-        .forEach(strong => {
-            const nextSibling = strong.nextSibling;
-            strong.textContent = target.value ? `${nameToApply}: ` : `[${nameToApply}]: `
-            if (nextSibling.tagName.toUpperCase() === "INPUT") {
-                nextSibling.name = nextSibling.name
-                    .replace(/\[[\w\s]+\]$/, `[${nameToApply}]`);
-            } else {
-                // serialized field
-                const regex = /^(record\[\d+\])\[[\w\s]+\]/;
-                nextSibling.querySelectorAll("section").forEach(section => {
-                    section.dataset.name = section.dataset.name
-                        .replace(regex, `$1[${nameToApply}]`)
-                    section.querySelectorAll("input").forEach(input => {
-                        input.name = input.name
-                            .replace(regex, `$1[${nameToApply}]`);
-                    });
-                });
-            }
-        });
-}
 const toggleFieldType = ({target}) => {
     document.querySelectorAll(`.csv-data > div:nth-of-type(${target.dataset.nth})`).forEach((field, i) => {
         const data = field.querySelector(":nth-child(2)");
@@ -137,6 +113,34 @@ $(function() {
     }
 
     // listeners
+    $(document).on('keyup', `#fields tr td:first-of-type > input[name^='keys']`, function(event) {
+        const $target = $(event.target)
+        const nthOfType = increment($target.attr('name').match(/\d+/))
+        const newName = $target.val() || 'no name'
+        $(`.csv-data > div:nth-of-type(${nthOfType}) strong`).each(function(_, strong) {
+            $(strong).text(`${$target.val() || '[no name]'}: `)
+            $(strong).next('input').each(function(_, input) {
+                const $input = $(input)
+                $input.attr('name', $input.attr('name').replace(/\[[\w\s]+\]$/, `[${newName}]`))
+            })
+            $(strong).next('.unserialized').find('section').each(function(_, section) {
+                const regex = /^(record\[\d+\])\[[\w\s]+\]/;
+                const $section = $(section)
+                $section.attr('data-name', $section.data('name').replace(regex, `$1[${newName}]`))
+                $section.find('input').each(function(_, input) {
+                    $(input).attr('name', $(input).attr('name').replace(regex, `$1[${newName}]`))
+                })
+            })
+        })
+    })
+    $(document).on('keyup', '.unserialized input:first-of-type', function(event) {
+        const $target = $(event.target)
+        const nameWithoutRecordNo = $target.prop('name').split(/(?<=record\[)\d+(?=\])/);
+        const value = $target.prop('value')
+        $('[data-id]').each(function(_i, record) {
+            $(record).find(`[name='${nameWithoutRecordNo.join($(record).data('id'))}']`).val(value)
+        })
+    })
     $(document).on('click', '.fields-manipulator>button', function() {
         const $tbody = $('.fields-manipulator tbody')
         const $tr = $tbody.find('tr:last-of-type').clone()
@@ -152,14 +156,6 @@ $(function() {
         $tbody.append($tr)
         $tr.find('input').first().focus()
         appendFields()
-    })
-    $(document).on('keyup', '.unserialized input:first-of-type', function(event) {
-        const $target = $(event.target)
-        const nameWithoutRecordNo = $target.prop('name').split(/(?<=record\[)\d+(?=\])/);
-        const value = $target.prop('value')
-        $('[data-id]').each(function(_i, record) {
-            $(record).find(`[name='${nameWithoutRecordNo.join($(record).data('id'))}']`).val(value)
-        })
     })
     $(document).on('click', '.unserialized button', function(event) {
         $(event.target).parent().remove()
