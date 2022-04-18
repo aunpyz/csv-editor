@@ -1,4 +1,16 @@
 # csv-editor
+### Composer
+```shell
+# install package
+composer
+
+# run a built-in web server via composer
+composer dev
+# or any port of your choice
+composer dev -- -p 8001
+
+```
+
 ### Run via shell
 
 ```shell
@@ -8,7 +20,7 @@ chmod +x ./serve.sh
 # built-in web server is listening to port 8000
 ./serve.sh
 
-# or you can change the port to your likingg
+# or you can change the port to your liking
 ./serve.sh -p 8001
 ```
 
