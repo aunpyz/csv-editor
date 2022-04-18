@@ -36,7 +36,7 @@
                                 <input name='keys[{$key}]' value='{$key_name}'>
                             </td>
                             <td>
-                                <input type='checkbox' data-nth='{$nthOfType}' oninput='toggleFieldType(event)'>
+                                <input type='checkbox' data-nth='{$nthOfType}'>
                             </td>
                             <td>
                                 <input disabled>

@@ -1,85 +1,3 @@
-const newElement = (type, text, attributes) => {
-    elm = document.createElement(type);
-    if (text) {
-        elm.textContent = text;
-    }
-    if (attributes) {
-        attributes.forEach(({
-            key,
-            value
-        }) => {
-            elm.setAttribute(key, value);
-        })
-    }
-
-    return elm;
-}
-const toggleFieldType = ({target}) => {
-    document.querySelectorAll(`.csv-data > div:nth-of-type(${target.dataset.nth})`).forEach((field, i) => {
-        const data = field.querySelector(":nth-child(2)");
-        if (data.tagName.toUpperCase() === "INPUT") {
-            const recordNo = field.parentNode.dataset.id;
-            // init serialize type input
-            const dataVal = data.value;
-            const name = target
-                    .parentNode
-                    .parentNode
-                    .querySelector("td:first-of-type input:first-of-type")
-                    .value;
-            const div = newElement("div", null, [
-                {key: 'class', value: 'unserialized'},
-                {key: 'data-name', value: name}
-            ]);
-            const addButtonDiv = newElement("div");
-            const section = newElement("section", null, [
-                {key: 'data-name', value: `record[${recordNo}][${name}]`},
-                {key: 'data-item', value: 0}
-            ])
-            const keyInput = newElement("input", null, [
-                {key: 'name', value: `record[${recordNo}][${name}][0][key]`},
-            ]);
-            const valueInput = newElement("input", null, [
-                {key: 'name', value: `record[${recordNo}][${name}][0][value]`}
-            ]);
-            const addButton = newElement("button", "Add new", [
-                {key: 'type', value: 'button'},
-                {key: 'class', value: 'newArrField'},
-            ]);
-            valueInput.value = dataVal;
-
-            section.appendChild(newElement("label", "Key: "));
-            section.appendChild(keyInput);
-            section.appendChild(newElement("label", "Value: "));
-            section.appendChild(valueInput);
-            section.appendChild(newElement("button", "Remove", [
-                {key: 'type', value: 'button'},
-            ]))
-            div.appendChild(section);
-            addButtonDiv.appendChild(addButton);
-            data.parentNode
-                .insertBefore(div, data)
-                .parentNode
-                .insertBefore(addButtonDiv, data);
-            
-            // only focus the first key input
-            if (!i) {
-                keyInput.focus();
-            }
-        } else {
-            // serialized field
-            // this will only pick the first value input as a value for normal input
-            const ref = data.querySelector("section:first-of-type");
-            const input = newElement("input", null, [
-                {key: 'name', value: ref.dataset.name}
-            ]);
-            input.value = ref.querySelector("input[name$='[value]']").value;
-            data.parentNode.insertBefore(input, data);
-            data.nextSibling.remove();
-        }
-        data.remove();
-    });
-}
-
 $(function() {
     const $file = $('#file')
     const $loadFileButton = $('#file-open')
@@ -113,6 +31,55 @@ $(function() {
     }
 
     // listeners
+    $(document).on('input', `#fields input[type='checkbox']`, function(event) {
+        const $checkbox = $(event.target)
+        if ($checkbox.prop('checked')) {
+            $(`.csv-data > div:nth-of-type(${$checkbox.data('nth')})`).each(function(_, div) {
+                $(div).children('input:nth-child(2)').each(function(_, normal) {
+                    const name = $(normal).attr('name').match(/^record\[\d+\]\[([\w\s]+)\]$/)[1]
+                    const $div = $('<div></div>').attr({
+                        'class': 'unserialized',
+                        'data-name': name,
+                    })
+                    const $section = $('<section></section>').attr({
+                        'data-name': $(normal).attr('name'),
+                        'data-item': 0,
+                    })
+                        .append(
+                            '<label>Key: </label>',
+                            $('<input>').attr('name', `${$(normal).attr('name')}[0][key]`),
+                            '<label>Value: </label>',
+                            $('<input>')
+                                .attr('name', `${$(normal).attr('name')}[0][value]`)
+                                .val($(normal).val()),
+                            $('<button>Remove</button>').attr('type', 'button'),
+                        )
+                    const $buttonDiv = $('<div></div>')
+                        .append($('<button>Add new</div>').attr({
+                            'type': 'button',
+                            'class': 'new-arr-field',
+                        }))
+                    $(div).append($div.append($section), $buttonDiv)
+                    $(normal).remove()
+                })
+            }).first()
+                .find('.unserialized input:first-of-type')
+                .focus()
+        }
+        else {
+            $(`.csv-data > div:nth-of-type(${$checkbox.data('nth')})`).each(function(_, div) {
+                $(div).children('div:nth-child(2)').each(function(_, serialized) {
+                    const $serialized = $(serialized)
+                    const $ref = $serialized.find('section:first-of-type')
+                    const $input = $('<input>')
+                        .attr('name', $ref.data('name'))
+                        .val($ref.find('input:last-of-type').val())
+                    $(div).append($input)
+                    $serialized.next().remove()
+                }).remove()
+            })
+        }
+    })
     $(document).on('keyup', `#fields tr td:first-of-type > input[name^='keys']`, function(event) {
         const $target = $(event.target)
         const nthOfType = increment($target.attr('name').match(/\d+/))
