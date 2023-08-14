@@ -1,56 +1,68 @@
 {extends 'layouts/default.tpl'}
 {block 'css'}
-    <link rel='stylesheet' href='color.css'>
     <link rel='stylesheet' href='index.css'>
 {/block}
 {block 'main'}
-    <form action='index.php' method='POST' enctype='multipart/form-data'>
-        <label>
-            File: <input id='file' type='file' accept='.csv' name='file'>
-        </label>
-        <button id='file-open' type='submit' value='open'>Open file</button>
+    <form action='index.php' method='POST' enctype='multipart/form-data' class='container my-4'>
+        <div class='row g-3 align-items-center'>
+            <div class='col-auto'>
+                <label class='col-form-label'>File:</label>
+            </div>
+            <div class='col-auto'>
+                <input id='file' type='file' accept='.csv' name='file' class='form-control'>
+            </div>
+            <div class='col-auto'>
+                <button id='file-open' type='submit' value='open' class='btn btn-primary'>Open file</button>
+            </div>
+        </div>
     </form>
     {if isset($files['file'])}
-        <form action='savefile.php' method='POST' enctype='multipart/form-data'>
+        <form action='savefile.php' method='POST' enctype='multipart/form-data' class='container my-4'>
             {$serialized_pattern = '/^a:\d+:{/'}
             {$file_path = $files['file']['tmp_name']}
             {$file=fopen($file_path, 'r+')}
             {$fields=fgetcsv($file)}
-            <div>
-                <label for='filename'>File name</label>
-                <input name='filename' value='{htmlentities($files['file']['name'])}'>
-                <button type='submit' value='save'>Save file</button>
+            <div class='row g-3 align-items-center'>
+                <div class='col-auto'>
+                    <label for='filename' class='col-form-label'>File name</label>
+                </div>
+                <div class='col-auto'>
+                    <input name='filename' value='{htmlentities($files['file']['name'])}' class='form-control'>
+                </div>
+                <div class='col-auto'>
+                    <button type='submit' value='save' class='btn btn-success'>Save file</button>
+                </div>
             </div>
-            <div class='fields-manipulator'>
-                <table id='fields'>
+            <div class='fields-manipulator p-2 my-4 border border-2 border-primary rounded'>
+                <table id='fields' class='table'>
                     <thead>
                         <th>Field name</th>
                         <th>Is serialized</th>
                         <th># of keys</th>
                     </thead>
-                    <tbody>
+                    <tbody class='table-group-divider'>
                     {foreach $fields as $key => $key_name}
                         {$nthOfType=$key+1}
                         <tr>
                             <td>
-                                <input name='keys[{$key}]' value='{htmlentities($key_name)}'>
+                                <input name='keys[{$key}]' value='{htmlentities($key_name)}' class='form-control'>
+                            </td>
+                            <td class='text-center align-middle'>
+                                <input type='checkbox' data-nth='{$nthOfType}' class='form-check-input'>
                             </td>
                             <td>
-                                <input type='checkbox' data-nth='{$nthOfType}'>
-                            </td>
-                            <td>
-                                <input disabled>
+                                <input disabled class='form-control'>
                             </td>
                         </tr>
                     {/foreach}
                     </tbody>
                 </table>
-                <button type='button'>Add new field</button>
+                <button type='button' class='btn btn-success'>Add new field</button>
             </div>
             <div>
-                <button id='new-record' type='button'>Add new record</button>
+                <button id='new-record' type='button' class='btn btn-primary'>Add new record</button>
             </div>
-            <div id='records'>
+            <div id='records' class='p-2 my-4 border border-2 border-success rounded'>
                 {$iter=0}
                 {while not feof($file)}
                     {$name='record['|cat:$iter|cat:']'}
@@ -71,12 +83,12 @@
                                                     <input name='{$extended_record_name|cat:'[key]'}' value='{htmlentities($key)}'>
                                                     <label>Value: </label>
                                                     <input name='{$extended_record_name|cat:'[value]'}' value='{htmlentities($data_lang)}'>
-                                                    <button type='button'>Remove</button>
+                                                    <button type='button' class='btn btn-danger'>Remove</button>
                                                 </section>
                                             {/foreach}
                                         </div>
                                         <div>
-                                            <button class='new-arr-field' type='button'>Add new</button>
+                                            <button type='button' class='new-arr-field btn btn-success'>Add new</button>
                                         </div>
                                     {else}
                                         <input name='{$record_name}' value='{htmlentities($field)}'>

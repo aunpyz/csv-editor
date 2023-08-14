@@ -52,12 +52,15 @@ $(function() {
                             $('<input>')
                                 .attr('name', `${$(normal).attr('name')}[0][value]`)
                                 .val($(normal).val()),
-                            $('<button>Remove</button>').attr('type', 'button'),
+                            $('<button>Remove</button>').attr({
+                                'type': 'button',
+                                'class': 'btn btn-danger',
+                            }),
                         )
                     const $buttonDiv = $('<div></div>')
                         .append($('<button>Add new</div>').attr({
                             'type': 'button',
-                            'class': 'new-arr-field',
+                            'class': 'new-arr-field btn btn-success',
                         }))
                     $(div).append($div.append($section), $buttonDiv)
                     $(normal).remove()
@@ -144,7 +147,10 @@ $(function() {
                 $keyInput,
                 '<label>Value: </label>',
                 $valueInput,
-                $('<button>Remove</button>').prop('type', 'button'),
+                $('<button>Remove</button>').attr({
+                    'type': 'button',
+                    'class': 'btn btn-danger',
+                }),
             )
             $(serialized).append($section)
         })

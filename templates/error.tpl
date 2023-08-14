@@ -1,7 +1,4 @@
 {extends 'layouts/default.tpl'}
-{block 'css'}
-    <link rel='stylesheet' href='color.css'>
-{/block}
 {block 'main'}
-	<div class='error'>{$error->getMessage()}</div>
+	<div class='container my-4 text-danger-emphasis'>{$error->getMessage()}</div>
 {/block}
