@@ -1,5 +1,7 @@
 FROM composer:2 as composer
 
+LABEL org.opencontainers.image.source="https://github.com/aunpyz/csv-editor"
+
 WORKDIR /app
 
 COPY composer.json composer.lock ./
