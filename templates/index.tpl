@@ -18,7 +18,7 @@
             {$fields=fgetcsv($file)}
             <div>
                 <label for='filename'>File name</label>
-                <input name='filename' value='{$files['file']['name']}'>
+                <input name='filename' value='{htmlentities($files['file']['name'])}'>
                 <button type='submit' value='save'>Save file</button>
             </div>
             <div class='fields-manipulator'>
@@ -33,7 +33,7 @@
                         {$nthOfType=$key+1}
                         <tr>
                             <td>
-                                <input name='keys[{$key}]' value='{$key_name}'>
+                                <input name='keys[{$key}]' value='{htmlentities($key_name)}'>
                             </td>
                             <td>
                                 <input type='checkbox' data-nth='{$nthOfType}'>
@@ -68,9 +68,9 @@
                                                 {$extended_record_name=$record_name|cat:'['|cat:$data_lang@index|cat:']'}
                                                 <section data-name='{$record_name}' data-item='{$data_lang@index}'>
                                                     <label>Key: </label>
-                                                    <input name='{$extended_record_name|cat:'[key]'}' value='{$key}'>
+                                                    <input name='{$extended_record_name|cat:'[key]'}' value='{htmlentities($key)}'>
                                                     <label>Value: </label>
-                                                    <input name='{$extended_record_name|cat:'[value]'}' value='{$data_lang}'>
+                                                    <input name='{$extended_record_name|cat:'[value]'}' value='{htmlentities($data_lang)}'>
                                                     <button type='button'>Remove</button>
                                                 </section>
                                             {/foreach}
@@ -79,7 +79,7 @@
                                             <button class='new-arr-field' type='button'>Add new</button>
                                         </div>
                                     {else}
-                                        <input name='{$record_name}' value='{$field}'>
+                                        <input name='{$record_name}' value='{htmlentities($field)}'>
                                     {/if}
                                 </div>
                             {/foreach}

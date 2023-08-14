@@ -29,3 +29,13 @@ chmod +x ./serve.sh
 ```php
 php -S localhost:8000
 ```
+
+### Run via Docker
+```shell
+# build docker image
+docker build -t csv-editor .
+
+# run the image
+docker container run --rm -d -p 80:80 csv-editor
+
+```
