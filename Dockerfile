@@ -20,4 +20,4 @@ WORKDIR /var/www/html
 
 COPY --from=composer app/vendor ./vendor
 
-COPY templates index.css index.js index.php savefile.php ./
+COPY templates index.js index.php savefile.php ./

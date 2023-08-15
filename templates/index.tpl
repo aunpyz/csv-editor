@@ -1,7 +1,4 @@
 {extends 'layouts/default.tpl'}
-{block 'css'}
-    <link rel='stylesheet' href='index.css'>
-{/block}
 {block 'main'}
     <form action='index.php' method='POST' enctype='multipart/form-data' class='container my-4'>
         <div class='row g-3 align-items-center'>
@@ -62,37 +59,55 @@
             <div>
                 <button id='new-record' type='button' class='btn btn-primary'>Add new record</button>
             </div>
-            <div id='records' class='p-2 my-4 border border-2 border-success rounded'>
+            <div id='records'>
                 {$iter=0}
                 {while not feof($file)}
                     {$name='record['|cat:$iter|cat:']'}
                     {$record=fgetcsv($file)}
                     {if not empty($record)}
-                        <div class='csv-data' data-id='{$iter++}'>
+                        <div class='csv-data g-3 px-2 my-4 border border-2 border-success rounded' data-id='{$iter++}'>
                             {foreach $record as $key => $field}
                                 {$record_name=$name|cat:'['|cat:$fields[$key]|cat:']'}
-                                <div>
-                                    <strong>{$fields[$key]}: </strong>
-                                    {if preg_match($serialized_pattern, $field)}
-                                        {$data_langs=unserialize($field)}
-                                        <div class='unserialized' data-name='{$fields[$key]}'>
-                                            {foreach $data_langs as $key => $data_lang}
-                                                {$extended_record_name=$record_name|cat:'['|cat:$data_lang@index|cat:']'}
-                                                <section data-name='{$record_name}' data-item='{$data_lang@index}'>
-                                                    <label>Key: </label>
-                                                    <input name='{$extended_record_name|cat:'[key]'}' value='{htmlentities($key)}'>
-                                                    <label>Value: </label>
-                                                    <input name='{$extended_record_name|cat:'[value]'}' value='{htmlentities($data_lang)}'>
-                                                    <button type='button' class='btn btn-danger'>Remove</button>
-                                                </section>
-                                            {/foreach}
-                                        </div>
-                                        <div>
-                                            <button type='button' class='new-arr-field btn btn-success'>Add new</button>
-                                        </div>
-                                    {else}
-                                        <input name='{$record_name}' value='{htmlentities($field)}'>
-                                    {/if}
+                                <div class='row my-2 align-items-center'>
+                                    <div class='col-auto'>
+                                        <strong class='col-form-label'>{$fields[$key]}: </strong>
+                                    </div>
+                                    <div class='col-auto'>
+                                        {if preg_match($serialized_pattern, $field)}
+                                            {$data_langs=unserialize($field)}
+                                            <div class='unserialized' data-name='{$fields[$key]}'>
+                                                {foreach $data_langs as $key => $data_lang}
+                                                    {$extended_record_name=$record_name|cat:'['|cat:$data_lang@index|cat:']'}
+                                                    <section data-name='{$record_name}' data-item='{$data_lang@index}' class='row align-items-center'>
+                                                        <div class='col-auto row py-1'>
+                                                            <div class='col-auto'>
+                                                                <label class='col-form-label'>Key: </label>
+                                                            </div>
+                                                            <div class='col-auto'>
+                                                                <input name='{$extended_record_name|cat:'[key]'}' value='{htmlentities($key)}' class='form-control'>
+                                                            </div>
+                                                        </div>
+                                                        <div class='col-auto row py-1'>
+                                                            <div class='col-auto'>
+                                                                <label class='col-form-label'>Value: </label>
+                                                            </div>
+                                                            <div class='col-auto'>
+                                                                <input name='{$extended_record_name|cat:'[value]'}' value='{htmlentities($data_lang)}' class='form-control'>
+                                                            </div>
+                                                        </div>
+                                                        <div class='col-auto py-1'>
+                                                            <button type='button' class='btn btn-danger'>Remove</button>
+                                                        </div>
+                                                    </section>
+                                                {/foreach}
+                                            </div>
+                                            <div class='pt-1'>
+                                                <button type='button' class='new-arr-field btn btn-success'>Add new</button>
+                                            </div>
+                                        {else}
+                                            <input name='{$record_name}' value='{htmlentities($field)}' class='form-control'>
+                                        {/if}
+                                    </div>
                                 </div>
                             {/foreach}
                         </div>
