@@ -129,7 +129,7 @@ $(function() {
                             'name': $ref.data('name'),
                             'class': 'form-control',
                         })
-                        .val($ref.find('input[name$="[value]"]').val())
+                        .val($ref.find(`input[name$='[value]']`).val())
                     $(div).append(
                         $fieldGroup.clone().append($input)
                     )
@@ -186,7 +186,6 @@ $(function() {
     })
     $(document).on('click', '.new-arr-field', function(event) {
         const $sibling = $(event.target).parent().parent().find('div:first-of-type')
-        console.log($sibling.data('name'))
         $(`div[data-name='${$sibling.data('name')}']`).each(function(_i, serialized) {
             const $lastChild = $(serialized).find('section:last-child')
             const [name, item] = [$lastChild.data('name'), increment($lastChild.data('item'))]
@@ -236,7 +235,6 @@ $(function() {
         })
     })
     $('#new-record').on('click', function() {
-        // TODO: Fix this function
         $records = $('#records')
         $lastRecord = $records.find('div.csv-data:last-of-type')
         if ($lastRecord.length) {
@@ -259,14 +257,75 @@ $(function() {
         else {
             const $fieldsContainer = $('#fields tbody')
             const $record = $('<div></div>').attr({
-                'class': 'csv-data',
+                'class': 'csv-data g-3 px-2 my-4 border border-2 border-success rounded',
                 'data-id': 0,
             })
-            $fieldsContainer.find('tr td:first-of-type input').each(function(_i, field) {
+            $fieldsContainer.find('tr').each(function(_i, rows) {
+                const $fieldName = $(rows).find(`input[name^='keys'`)
+                const $fieldSerialized =$(rows).find('input[type=checkbox]')
+                const $fieldInput = $fieldSerialized.prop('checked')
+                    ? $('<div></div>').attr({
+                        'data-name': $fieldName.val(),
+                        'class': 'unserialized',
+                    }).append(
+                        $('<section></section>').attr({
+                            'data-name': `record[0][${$fieldName.val()}]`,
+                            'data-item': 0,
+                            'class': 'row align-items-center',
+                        }).append(
+                            $fieldsGroup.clone().append(
+                                $fieldGroup.clone().append(
+                                    $('<label>Key: </label>').attr({
+                                        'class': 'col-form-label'
+                                    }),
+                                ),
+                                $fieldGroup.clone().append(
+                                    $('<input>').attr({
+                                        'name': `record[0][${$fieldName.val()}][0][key]`,
+                                        'class': 'form-control',
+                                    })
+                                ),
+                            ),
+                            $fieldsGroup.clone().append(
+                                $fieldGroup.clone().append(
+                                    $('<label>Value: </label>').attr({
+                                        'class': 'col-form-label'
+                                    }),
+                                ),
+                                $fieldGroup.clone().append(
+                                    $('<input>').attr({
+                                        'name': `record[0][${$fieldName.val()}][0][value]`,
+                                        'class': 'form-control',
+                                    }),
+                                ),
+                            ),
+                            $fieldGroup.clone().addClass('py-1').append(
+                                $('<button>Remove</button>').attr({
+                                    'type': 'button',
+                                    'class': 'btn btn-danger',
+                                }),
+                            )
+                        ),
+                    )
+                    : $('<input>').attr('name', `record[0][${$fieldName.val()}]`).addClass('form-control')
                 $record.append(
-                    $('<div></div>').append(
-                        `<strong>${$(field).val()}: </strong>`,
-                        $('<input>').attr('name', `record[0][${$(field).val()}]`),
+                    $('<div></div>').attr({
+                        'class': 'row my-2 align-items-center'
+                    }).append(
+                        $fieldGroup.clone().append(
+                            $(`<strong>${$fieldName.val()}: </strong>`).addClass('col-form-label'),
+                        ),
+                        $fieldGroup.clone().append(
+                            $fieldInput,
+                            $fieldSerialized.prop('checked')
+                            ? $('<div></div>').addClass('pt-1').append(
+                                $('<button>Add new</div>').attr({
+                                    'type': 'button',
+                                    'class': 'new-arr-field btn btn-success',
+                                }),
+                            )
+                            : undefined
+                        ),
                     )
                 )
             })
