@@ -9,7 +9,7 @@
                 <input id='file' type='file' accept='.csv' name='file' class='form-control'>
             </div>
             <div class='col-auto'>
-                <button id='file-open' type='submit' value='open' class='btn btn-primary'>Open file</button>
+                <button id='file-open' type='submit' value='open' disabled class='btn btn-primary'>Open file</button>
             </div>
         </div>
     </form>
