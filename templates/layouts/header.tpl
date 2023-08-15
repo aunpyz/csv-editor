@@ -4,4 +4,5 @@
 	{block css}{/block}
 	{block head_css}{/block}
 	<title>CSV Editor</title>
+    <header class='container mt-4 text-center fs-1'>CSV Editor</header>
 </head>

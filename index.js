@@ -1,6 +1,12 @@
 $(function() {
     const $file = $('#file')
     const $loadFileButton = $('#file-open')
+    const $fieldsGroup = $('<div></div>').attr({
+        'class': 'col-auto row py-1'
+    })
+    const $fieldGroup = $('<div></div>').attr({
+        'class': 'col-auto',
+    })
 
     // utils
     const increment = function(d) {
@@ -25,9 +31,6 @@ $(function() {
             const $div = $('<div></div>').attr({
                 'class': 'row my-2 align-items-center'
             })
-            const $fieldGroup = $('<div></div>').attr({
-                'class': 'col-auto',
-            })
             const $input = $('<input>').attr({
                 'name': lastInputName.replace(/\[[\w\s]+\]$/, '[no name]'),
                 'class': 'form-control',
@@ -48,39 +51,69 @@ $(function() {
 
     // listeners
     $(document).on('input', `#fields input[type='checkbox']`, function(event) {
-        // TODO: Fix this function
         const $checkbox = $(event.target)
         if ($checkbox.prop('checked')) {
             $(`.csv-data > div:nth-of-type(${$checkbox.data('nth')})`).each(function(_, div) {
-                $(div).children('input:nth-child(2)').each(function(_, normal) {
-                    const name = $(normal).attr('name').match(/^record\[\d+\]\[([\w\s]+)\]$/)[1]
+                $(div).children('div:nth-child(2)').each(function(_, vnormal) {
+                    const $normal = $(vnormal).find('input')
+                    const name = $normal.attr('name').match(/^record\[\d+\]\[([\w\s]+)\]$/)[1]
                     const $div = $('<div></div>').attr({
                         'class': 'unserialized',
                         'data-name': name,
                     })
                     const $section = $('<section></section>').attr({
-                        'data-name': $(normal).attr('name'),
+                        'data-name': $normal.attr('name'),
                         'data-item': 0,
+                        'class': 'row align-items-center'
                     }).append(
-                        '<label>Key: </label>',
-                        $('<input>').attr('name', `${$(normal).attr('name')}[0][key]`),
-                        '<label>Value: </label>',
-                        $('<input>')
-                            .attr('name', `${$(normal).attr('name')}[0][value]`)
-                            .val($(normal).val()),
-                        $('<button>Remove</button>').attr({
-                            'type': 'button',
-                            'class': 'btn btn-danger',
-                        }),
+                        $fieldsGroup.clone().append(
+                            $fieldGroup.clone().append(
+                                $('<label>Key: </label>').attr({
+                                    'class': 'col-form-label'
+                                }),
+                            ),
+                            $fieldGroup.clone().append(
+                                $('<input>').attr({
+                                    'name': `${$normal.attr('name')}[0][key]`,
+                                    'class': 'form-control',
+                                })
+                            )
+                        ),
+                        $fieldsGroup.clone().append(
+                            $fieldGroup.clone().append(
+                                $('<label>Value: </label>').attr({
+                                    'class': 'col-form-label'
+                                }),
+                            ),
+                            $fieldGroup.clone().append(
+                                $('<input>').attr({
+                                    'name': `${$normal.attr('name')}[0][value]`,
+                                    'class': 'form-control',
+                                }).val($normal.val())
+                            )
+                        ),
+                        $fieldGroup.clone().addClass('py-1').append(
+                            $('<button>Remove</button>').attr({
+                                'type': 'button',
+                                'class': 'btn btn-danger',
+                            }),
+                        ),
                     )
                     const $buttonDiv = $('<div></div>').attr({
                         'class': 'pt-1',
-                    }).append($('<button>Add new</div>').attr({
+                    }).append(
+                        $('<button>Add new</div>').attr({
                             'type': 'button',
                             'class': 'new-arr-field btn btn-success',
-                        }))
-                    $(div).append($div.append($section), $buttonDiv)
-                    $(normal).remove()
+                        }),
+                    )
+                    $(div).append(
+                        $fieldGroup.clone().append(
+                            $div.append($section),
+                            $buttonDiv,
+                        )
+                    )
+                    $(vnormal).remove()
                 })
             }).first()
                 .find('.unserialized input:first-of-type')
@@ -88,14 +121,18 @@ $(function() {
         }
         else {
             $(`.csv-data > div:nth-of-type(${$checkbox.data('nth')})`).each(function(_, div) {
-                $(div).children('div:nth-child(2)').each(function(_, serialized) {
-                    const $serialized = $(serialized)
+                $(div).children('div:nth-child(2)').each(function(_, vserialized) {
+                    const $serialized = $(vserialized).find('.unserialized')
                     const $ref = $serialized.find('section:first-of-type')
                     const $input = $('<input>')
-                        .attr('name', $ref.data('name'))
-                        .val($ref.find('input:last-of-type').val())
-                    $(div).append($input)
-                    $serialized.next().remove()
+                        .attr({
+                            'name': $ref.data('name'),
+                            'class': 'form-control',
+                        })
+                        .val($ref.find('input[name$="[value]"]').val())
+                    $(div).append(
+                        $fieldGroup.clone().append($input)
+                    )
                 }).remove()
             })
         }
@@ -145,10 +182,11 @@ $(function() {
         appendFields()
     })
     $(document).on('click', '.unserialized button', function(event) {
-        $(event.target).parent().remove()
+        $(event.target).parent().parent().remove()
     })
     $(document).on('click', '.new-arr-field', function(event) {
         const $sibling = $(event.target).parent().parent().find('div:first-of-type')
+        console.log($sibling.data('name'))
         $(`div[data-name='${$sibling.data('name')}']`).each(function(_i, serialized) {
             const $lastChild = $(serialized).find('section:last-child')
             const [name, item] = [$lastChild.data('name'), increment($lastChild.data('item'))]
@@ -157,12 +195,6 @@ $(function() {
                 'data-name': name,
                 'data-item': item,
                 'class': 'row align-items-center'
-            })
-            const $fieldGroups = $('<div></div>').attr({
-                'class': 'col-auto row py-1'
-            })
-            const $fieldGroup = $('<div></div>').attr({
-                'class': 'col-auto',
             })
             const $keyInput = $('<input>').attr({
                 'name': `${newName}[key]`,
@@ -173,7 +205,7 @@ $(function() {
                 'class': 'form-control',
             })
             $section.append(
-                $fieldGroups.clone().append(
+                $fieldsGroup.clone().append(
                     $fieldGroup.clone().append(
                         $('<label>Key: </label>').attr({
                             'class': 'col-form-label'
@@ -183,7 +215,7 @@ $(function() {
                         $keyInput,
                     ),
                 ),
-                $fieldGroups.clone().append(
+                $fieldsGroup.clone().append(
                     $fieldGroup.clone().append(
                         $('<label>Value: </label>').attr({
                             'class': 'col-form-label'
@@ -193,7 +225,7 @@ $(function() {
                         $valueInput,
                     ),
                 ),
-                $fieldGroups.clone().append(
+                $fieldGroup.clone().addClass('py-1').append(
                     $('<button>Remove</button>').attr({
                         'type': 'button',
                         'class': 'btn btn-danger',
@@ -211,7 +243,6 @@ $(function() {
             const newRecordId = increment($lastRecord.data('id'))
             const $newRecord = $lastRecord.clone()
             $newRecord.attr('data-id', newRecordId)
-            $newRecord.find('.new-arr-field').prop('disabled', true)
             $newRecord.find(`input:not([name$='[id]'],[name$='[key]'])`).each(function(_i, input) {
                 $(input).prop('value', '')
             })
